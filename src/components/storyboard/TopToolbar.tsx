@@ -14,6 +14,7 @@ import {
   RotateCcw,
   Loader2,
   FolderOpen,
+  FolderCog,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -34,6 +35,7 @@ export function TopToolbar() {
     activeJob,
     setLoadJsonDialogOpen,
     setProviderSettingsDialogOpen,
+    setProjectListDialogOpen,
     setActiveJob,
     loadProject,
   } = useStoryboardStore();
@@ -247,6 +249,15 @@ export function TopToolbar() {
         )}
 
         {/* Utility Buttons */}
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6 text-[10px] gap-1 px-1.5"
+          onClick={() => setProjectListDialogOpen(true)}
+        >
+          <FolderCog className="h-3 w-3" />
+          Project
+        </Button>
         <Button
           variant="ghost"
           size="sm"

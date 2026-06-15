@@ -25,10 +25,11 @@ import { GambarColumn } from './GambarColumn';
 import { VideoColumn } from './VideoColumn';
 import { LoadJsonDialog } from './LoadJsonDialog';
 import { ProviderSettingsDialog } from './ProviderSettingsDialog';
+import { ProjectListDialog } from './ProjectListDialog';
 import { toast } from 'sonner';
 
 export function StoryboardStudio() {
-  const { currentProject, setLoadJsonDialogOpen } = useStoryboardStore();
+  const { currentProject, setLoadJsonDialogOpen, setProjectListDialogOpen } = useStoryboardStore();
   const { theme, setTheme } = useTheme();
   const [mobileTab, setMobileTab] = useState<'storyline' | 'gambar' | 'video'>('storyline');
 
@@ -71,12 +72,38 @@ export function StoryboardStudio() {
   const handleSave = useCallback(async () => {
     if (!currentProject) return;
     try {
-      const res = await fetch(`/api/storyboard/${currentProject.id}`);
+      const scenes = useStoryboardStore.getState().scenes;
+      const sceneUpdates = scenes.map((s) => ({
+        scene_id: s.scene_id,
+        vo: s.vo,
+        image_prompt: s.image_prompt,
+        video_prompt: s.video_prompt,
+        negative_prompt: s.negative_prompt,
+        locked: s.locked,
+        duration: s.duration,
+        image_status: s.image_status,
+        video_status: s.video_status,
+      }));
+
+      const res = await fetch(`/api/storyboard/${currentProject.id}/save`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          project: {
+            title: currentProject.title,
+            aspect_ratio: currentProject.aspect_ratio,
+            resolution: currentProject.resolution,
+            style: currentProject.style,
+            status: currentProject.status,
+          },
+          scenes: sceneUpdates,
+        }),
+      });
       const data = await res.json();
       if (data.ok) {
-        toast.success('Project tersimpan');
+        toast.success(`Project tersimpan (${data.updated_scenes} scene diperbarui)`);
       } else {
-        toast.error('Gagal menyimpan');
+        toast.error(data.error || 'Gagal menyimpan');
       }
     } catch {
       toast.error('Gagal menyimpan');
@@ -89,6 +116,7 @@ export function StoryboardStudio() {
       <div className="flex flex-col min-h-screen bg-background">
         <LoadJsonDialog />
         <ProviderSettingsDialog />
+        <ProjectListDialog />
 
         <div className="flex-1 flex items-center justify-center">
           <motion.div
@@ -102,14 +130,25 @@ export function StoryboardStudio() {
             <p className="text-muted-foreground mb-6">
               Create, manage, and generate AI-powered storyboard content. Load a JSON file to get started.
             </p>
-            <Button
-              size="lg"
-              className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
-              onClick={() => setLoadJsonDialogOpen(true)}
-            >
-              <Upload className="h-4 w-4" />
-              Load Storyboard JSON
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button
+                size="lg"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
+                onClick={() => setLoadJsonDialogOpen(true)}
+              >
+                <Upload className="h-4 w-4" />
+                Load Storyboard JSON
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="gap-2"
+                onClick={() => setProjectListDialogOpen(true)}
+              >
+                <FileText className="h-4 w-4" />
+                Buka Project
+              </Button>
+            </div>
 
             <div className="mt-8 text-xs text-muted-foreground space-y-1">
               <p>Supported formats: JSON with project and scenes</p>
@@ -139,6 +178,7 @@ export function StoryboardStudio() {
     <div className="flex flex-col h-screen bg-background">
       <LoadJsonDialog />
       <ProviderSettingsDialog />
+      <ProjectListDialog />
 
       {/* Header */}
       <header className="border-b bg-background/95 backdrop-blur shrink-0">

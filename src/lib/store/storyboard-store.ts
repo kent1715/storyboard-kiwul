@@ -44,6 +44,7 @@ interface StoryboardState {
   // Dialogs
   loadJsonDialogOpen: boolean;
   providerSettingsDialogOpen: boolean;
+  projectListDialogOpen: boolean;
 
   // Providers
   providers: ProviderConfig[];
@@ -62,6 +63,7 @@ interface StoryboardState {
   setIsPolling: (polling: boolean) => void;
   setLoadJsonDialogOpen: (open: boolean) => void;
   setProviderSettingsDialogOpen: (open: boolean) => void;
+  setProjectListDialogOpen: (open: boolean) => void;
   setProviders: (providers: ProviderConfig[]) => void;
   setProvidersLoading: (loading: boolean) => void;
   updateSceneFromJob: (updatedScenes: JobProgress['updated_scenes']) => void;
@@ -76,6 +78,7 @@ export const useStoryboardStore = create<StoryboardState>((set, get) => ({
   isPolling: false,
   loadJsonDialogOpen: false,
   providerSettingsDialogOpen: false,
+  projectListDialogOpen: false,
   providers: [],
   providersLoading: false,
 
@@ -120,6 +123,8 @@ export const useStoryboardStore = create<StoryboardState>((set, get) => ({
   setLoadJsonDialogOpen: (open) => set({ loadJsonDialogOpen: open }),
 
   setProviderSettingsDialogOpen: (open) => set({ providerSettingsDialogOpen: open }),
+
+  setProjectListDialogOpen: (open) => set({ projectListDialogOpen: open }),
 
   setProviders: (providers) => set({ providers }),
 
