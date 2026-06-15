@@ -1,0 +1,67 @@
+{
+  "project": {
+    "title": "Tingkah Serangga Bikin Geleng Kepala",
+    "language": "id",
+    "aspect_ratio": "9:16",
+    "resolution": "1080x1920",
+    "duration_seconds": 30,
+    "style": "cinematic realistic",
+    "target_platform": "youtube_shorts"
+  },
+  "scenes": [
+    {
+      "scene_id": "scene_001",
+      "scene_number": 1,
+      "duration": 5,
+      "vo": "Kumbang bombardier menembakkan cairan kimia mendidih untuk menyerang musuhnya.",
+      "image_prompt": "Cinematic vertical macro close-up of a bombardier beetle on the forest floor, spraying a powerful, hot puff of chemical mist from its abdomen, highly detailed, realistic, natural lighting, documentary style",
+      "video_prompt": "Bombardier beetle spraying explosive chemical mist from its abdomen, sharp focus, dramatic macro movement",
+      "negative_prompt": "text, watermark, logo, UI, label, subtitle, blurry, low quality, distorted, deformed"
+    },
+    {
+      "scene_id": "scene_002",
+      "scene_number": 2,
+      "duration": 5,
+      "vo": "Kumbang kotoran menggunakan galaksi bimasakti sebagai kompas navigasi malam hari.",
+      "image_prompt": "Cinematic vertical macro close-up of a dung beetle rolling a perfect round dung ball on desert sand, starry milky way night sky background, highly detailed, realistic, documentary style",
+      "video_prompt": "Dung beetle rolling a ball backward on sand under a glowing starry sky, smooth single motion",
+      "negative_prompt": "text, watermark, logo, UI, label, subtitle, blurry, low quality, distorted, deformed"
+    },
+    {
+      "scene_id": "scene_003",
+      "scene_number": 3,
+      "duration": 5,
+      "vo": "Jamur zombi bisa mengendalikan otak semut dan mengubahnya menjadi robot.",
+      "image_prompt": "Cinematic vertical macro close-up of a dead ant biting firmly onto a green leaf vein, a small cordyceps fungus stalk growing out of its head, eerie natural lighting, documentary style",
+      "video_prompt": "Ant gripping a leaf vein tightly while camera slowly zooms in on the growing fungal stalk, realistic anatomy",
+      "negative_prompt": "text, watermark, logo, UI, label, subtitle, blurry, low quality, distorted, deformed"
+    },
+    {
+      "scene_id": "scene_004",
+      "scene_number": 4,
+      "duration": 5,
+      "vo": "Belalang sembah adalah satu-satunya serangga yang bisa menoleh seratus delapan puluh derajat.",
+      "image_prompt": "Cinematic vertical macro close-up of a vivid green praying mantis turning its triangular head completely to look directly at the viewer, blurred background, highly detailed, realistic",
+      "video_prompt": "Praying mantis smoothly turning its head to face the camera, realistic subtle compound eye reflection",
+      "negative_prompt": "text, watermark, logo, UI, label, subtitle, blurry, low quality, distorted, deformed"
+    },
+    {
+      "scene_id": "scene_005",
+      "scene_number": 5,
+      "duration": 5,
+      "vo": "Lebah madu menari dengan gerakan khusus untuk memberi tahu lokasi makanan.",
+      "image_prompt": "Cinematic vertical macro close-up of a honeybee performing the waggle dance on golden glowing hexagonal honeycombs, surrounded by other bees, highly detailed, realistic",
+      "video_prompt": "Honeybee rapidly wiggling its abdomen and turning in a precise loop on the honeycomb",
+      "negative_prompt": "text, watermark, logo, UI, label, subtitle, blurry, low quality, distorted, deformed"
+    },
+    {
+      "scene_id": "scene_006",
+      "scene_number": 6,
+      "duration": 5,
+      "vo": "Kepik pembunuh menggendong tumpukan mayat korbannya sebagai pelindung tubuh.",
+      "image_prompt": "Cinematic vertical macro close-up of an assassin bug walking on tree bark, carrying a macabre pile of dried dead ant bodies on its back as camouflage armor, highly detailed, realistic",
+      "video_prompt": "Assassin bug crawling forward slowly with a trembling pile of insect shells on its back, realistic macro shot",
+      "negative_prompt": "text, watermark, logo, UI, label, subtitle, blurry, low quality, distorted, deformed"
+    }
+  ]
+}
