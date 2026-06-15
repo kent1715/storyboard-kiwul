@@ -1,0 +1,103 @@
+{
+  "project": {
+    "title": "Test Long Storyboard",
+    "language": "id",
+    "aspect_ratio": "9:16",
+    "resolution": "1080x1920",
+    "duration_seconds": 120,
+    "style": "cinematic realistic",
+    "target_platform": "youtube_shorts"
+  },
+  "scenes": [
+    {
+      "scene_id": "scene_001",
+      "scene_number": 1,
+      "duration": 5,
+      "vo": "Bayangkan jika mimpi manusia bisa direkam dan ditampilkan kembali layaknya film.",
+      "image_prompt": "cinematic realistic vertical frame, a person waking up in a dark bedroom, soft morning light filtering through curtains, mysterious atmosphere with subtle fog, warm tones",
+      "video_prompt": "slow camera push in, subtle breathing motion, curtains moving gently, cinematic lighting with lens flare",
+      "negative_prompt": "blurry, low quality, distorted face"
+    },
+    {
+      "scene_id": "scene_002",
+      "scene_number": 2,
+      "duration": 5,
+      "vo": "Teknologi kini memungkinkan kita melihat apa yang terjadi di dalam otak manusia secara real-time.",
+      "image_prompt": "cinematic realistic vertical frame, futuristic brain scan visualization, glowing neural pathways, dark background with holographic displays",
+      "video_prompt": "camera orbit around brain, neural pathways light up sequentially, holographic display rotating",
+      "negative_prompt": "blurry, low quality, cartoon"
+    },
+    {
+      "scene_id": "scene_003",
+      "scene_number": 3,
+      "duration": 5,
+      "vo": "Para ilmuwan mengembangkan alat yang bisa menerjemahkan sinyal otak menjadi gambar visual.",
+      "image_prompt": "cinematic realistic vertical frame, scientist in lab coat looking at monitor showing brain imagery, high-tech laboratory environment",
+      "video_prompt": "camera pan from scientist face to monitor, zoom into brain imagery on screen",
+      "negative_prompt": "blurry, low quality, distorted"
+    },
+    {
+      "scene_id": "scene_004",
+      "scene_number": 4,
+      "duration": 5,
+      "vo": "Setiap mimpi memiliki cerita yang unik dan penuh makna tersembunyi.",
+      "image_prompt": "cinematic realistic vertical frame, dreamlike landscape with floating islands, aurora borealis sky, ethereal atmosphere",
+      "video_prompt": "slow aerial pan across floating islands, aurora shifting colors, clouds drifting",
+      "negative_prompt": "blurry, low quality, cartoon"
+    },
+    {
+      "scene_id": "scene_005",
+      "scene_number": 5,
+      "duration": 5,
+      "vo": "Dengan teknologi terbaru, kita bisa merekam dan menganalisis pola mimpi secara detail.",
+      "image_prompt": "cinematic realistic vertical frame, advanced recording device attached to sleeping person, data streams flowing from head, futuristic bedroom",
+      "video_prompt": "camera slowly zooms into the device, data streams pulse and flow, subtle glow effects",
+      "negative_prompt": "blurry, low quality, distorted"
+    },
+    {
+      "scene_id": "scene_006",
+      "scene_number": 6,
+      "duration": 5,
+      "vo": "Proses perekaman mimpi membutuhkan peralatan canggih dan algoritma AI yang kompleks.",
+      "image_prompt": "cinematic realistic vertical frame, server room with blinking lights, AI neural network visualization on screens, cold blue lighting",
+      "video_prompt": "camera moves through server racks, lights blinking, screens showing data processing",
+      "negative_prompt": "blurry, low quality, messy"
+    },
+    {
+      "scene_id": "scene_007",
+      "scene_number": 7,
+      "duration": 5,
+      "vo": "Hasilnya adalah visualisasi mimpi yang menakjubkan dan penuh warna.",
+      "image_prompt": "cinematic realistic vertical frame, colorful dream visualization on large screen, abstract art meeting reality, vibrant colors",
+      "video_prompt": "colors morph and blend on screen, dream imagery transitions smoothly",
+      "negative_prompt": "blurry, low quality, dull"
+    },
+    {
+      "scene_id": "scene_008",
+      "scene_number": 8,
+      "duration": 5,
+      "vo": "Namun, tidak semua mimpi terasa indah. Ada juga mimpi buruk yang menghantui.",
+      "image_prompt": "cinematic realistic vertical frame, dark nightmare scene, shadowy figures in fog, red and black color palette, ominous atmosphere",
+      "video_prompt": "shadows moving closer, fog thickening, red light pulsing ominously",
+      "negative_prompt": "bright, cheerful, low quality"
+    },
+    {
+      "scene_id": "scene_009",
+      "scene_number": 9,
+      "duration": 5,
+      "vo": "Teknologi ini membuka pintu ke dunia yang belum pernah kita jelajahi sebelumnya.",
+      "image_prompt": "cinematic realistic vertical frame, person standing at edge of portal to another dimension, swirling cosmic energy, awe-inspiring scale",
+      "video_prompt": "portal expanding, cosmic energy swirling, person stepping forward",
+      "negative_prompt": "blurry, low quality, small scale"
+    },
+    {
+      "scene_id": "scene_010",
+      "scene_number": 10,
+      "duration": 5,
+      "vo": "Masa depan perekaman mimpi sudah dimulai, dan kita adalah saksi sejarahnya.",
+      "image_prompt": "cinematic realistic vertical frame, futuristic city skyline at sunset, people walking with dream recording devices, hopeful atmosphere",
+      "video_prompt": "camera rises above city, sunset casting golden light, people walking with glowing devices",
+      "negative_prompt": "blurry, low quality, dark"
+    }
+  ]
+}

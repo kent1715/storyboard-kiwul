@@ -128,8 +128,8 @@ export function LoadJsonDialog() {
 
   return (
     <Dialog open={loadJsonDialogOpen} onOpenChange={setLoadJsonDialogOpen}>
-      <DialogContent className="sm:max-w-2xl max-h-[85vh] flex flex-col">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
+        <DialogHeader className="shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <FileJson className="h-5 w-5 text-emerald-600" />
             Load Storyboard JSON
@@ -139,21 +139,22 @@ export function LoadJsonDialog() {
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="paste" className="flex-1 flex flex-col min-h-0">
-          <TabsList>
+        <Tabs defaultValue="paste" className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          <TabsList className="shrink-0">
             <TabsTrigger value="paste">Paste JSON</TabsTrigger>
             <TabsTrigger value="upload">Upload File</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="paste" className="flex-1 min-h-0 mt-2">
+          <TabsContent value="paste" className="flex-1 min-h-0 mt-2 overflow-hidden">
             <Textarea
               value={jsonText}
               onChange={(e) => {
                 setJsonText(e.target.value);
                 setValidation(null);
               }}
-              className="min-h-[200px] font-mono text-xs resize-y"
+              className="h-full min-h-[200px] font-mono text-xs resize-none !field-sizing-fixed"
               placeholder='{"project": {...}, "scenes": [...]}'
+              style={{ fieldSizing: 'fixed' }}
             />
           </TabsContent>
 
@@ -188,7 +189,7 @@ export function LoadJsonDialog() {
 
         {/* Validation Results */}
         {validation && (
-          <div className="space-y-2 max-h-40 overflow-y-auto">
+          <div className="space-y-2 max-h-40 overflow-y-auto shrink-0">
             {validation.valid && (
               <div className="flex items-center gap-2 p-2 rounded bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400">
                 <CheckCircle className="h-4 w-4 shrink-0" />
@@ -224,7 +225,7 @@ export function LoadJsonDialog() {
           </div>
         )}
 
-        <DialogFooter>
+        <DialogFooter className="shrink-0">
           <Button variant="outline" onClick={() => setLoadJsonDialogOpen(false)} size="sm">
             Cancel
           </Button>
