@@ -28,7 +28,7 @@ export function SceneSidebar() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col h-full bg-background overflow-hidden">
       {/* Stats Header */}
       <div className="p-3 border-b shrink-0">
         <div className="text-xs font-medium text-muted-foreground mb-2">Scenes Overview</div>
@@ -73,7 +73,7 @@ export function SceneSidebar() {
       <Separator />
 
       {/* Scene List */}
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1 min-h-0">
         <div className="p-2 space-y-1">
           {scenes.map((scene) => {
             const isSelected = scene.scene_id === selectedSceneId;

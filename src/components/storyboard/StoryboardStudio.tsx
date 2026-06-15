@@ -97,7 +97,7 @@ export function StoryboardStudio() {
 
           {/* Center Panel - Scene Detail */}
           <ResizablePanel defaultSize={previewCollapsed ? 82 : 45} minSize={30}>
-            <div className="relative h-full">
+            <div className="relative h-full flex flex-col overflow-hidden">
               <Button
                 variant="ghost"
                 size="sm"
@@ -106,7 +106,9 @@ export function StoryboardStudio() {
               >
                 {sidebarCollapsed ? <PanelLeft className="h-3.5 w-3.5" /> : <PanelLeftClose className="h-3.5 w-3.5" />}
               </Button>
-              <SceneDetailPanel />
+              <div className="flex-1 min-h-0">
+                <SceneDetailPanel />
+              </div>
             </div>
           </ResizablePanel>
 
