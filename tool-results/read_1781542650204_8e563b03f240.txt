@@ -1,0 +1,1384 @@
+     1→     1→# PRD — Kiwul Storyboard Studio
+     2→     2→
+     3→     3→**Versi:** 1.0  
+     4→     4→**Status:** Draft lengkap  
+     5→     5→**Produk:** Modul Storyboard mandiri dari Kiwul  
+     6→     6→**Tujuan utama:** Load JSON storyboard → tampilkan VO, image prompt, video prompt → generate image/video → preview → download hasil.
+     7→     7→
+     8→     8→---
+     9→     9→
+    10→    10→## 1. Ringkasan Produk
+    11→    11→
+    12→    12→**Kiwul Storyboard Studio** adalah program khusus untuk mengeksekusi storyboard berbasis JSON. Program ini tidak berfokus pada ideation atau pembuatan script dari nol, tetapi fokus pada tahap produksi visual: membaca storyboard dari JSON, menampilkan setiap scene, mengirim prompt image dan video ke provider lokal, lalu menyimpan serta menyediakan hasil image/video untuk di-preview dan di-download.
+    13→    13→
+    14→    14→Setiap scene memiliki tiga komponen utama:
+    15→    15→
+    16→    16→1. **VO** — narasi atau voice over.
+    17→    17→2. **Image Prompt** — prompt untuk membuat gambar scene.
+    18→    18→3. **Video Prompt** — prompt untuk membuat video dari gambar scene.
+    19→    19→
+    20→    20→Program harus mendukung aspect ratio `9:16` dan `16:9`, durasi total dari `30 detik` sampai `15 menit`, jumlah scene mengikuti isi JSON, serta tombol **Generate All** dengan sistem queue dan polling sehingga hasil scene yang selesai langsung muncul tanpa menunggu seluruh proses selesai.
+    21→    21→
+    22→    22→---
+    23→    23→
+    24→    24→## 2. Tujuan Produk
+    25→    25→
+    26→    26→Tujuan Kiwul Storyboard Studio:
+    27→    27→
+    28→    28→1. Membaca storyboard dari file JSON.
+    29→    29→2. Menampilkan scene dalam UI yang mudah dipahami.
+    30→    30→3. Menyediakan editor VO, image prompt, dan video prompt per scene.
+    31→    31→4. Menghubungkan program ke provider image dan video.
+    32→    32→5. Generate image per scene.
+    33→    33→6. Generate video per scene.
+    34→    34→7. Generate semua scene melalui tombol **Generate All**.
+    35→    35→8. Memakai sistem queue dan polling.
+    36→    36→9. Menampilkan hasil image/video langsung saat selesai.
+    37→    37→10. Menyediakan tombol download image dan video.
+    38→    38→11. Menyediakan export JSON final berisi path hasil generate.
+    39→    39→12. Tidak hardcoded pada provider, model, aspect ratio, durasi, atau jumlah scene.
+    40→    40→
+    41→    41→---
+    42→    42→
+    43→    43→## 3. Masalah yang Diselesaikan
+    44→    44→
+    45→    45→Masalah utama dalam produksi video AI lokal:
+    46→    46→
+    47→    47→1. Storyboard sering hanya berupa teks atau JSON yang belum bisa langsung dieksekusi.
+    48→    48→2. VO, image prompt, dan video prompt sering tidak sinkron.
+    49→    49→3. User harus copy-paste prompt satu per satu ke engine image/video.
+    50→    50→4. Hasil image/video sulit dikaitkan kembali ke scene.
+    51→    51→5. Tidak ada status per scene.
+    52→    52→6. Jika satu scene gagal, user sulit regenerate hanya scene itu.
+    53→    53→7. Tidak ada tombol download per scene.
+    54→    54→8. Tidak ada sistem batch generation yang aman untuk GPU lokal.
+    55→    55→9. Tidak ada polling progress sehingga user tidak tahu proses sedang berjalan atau macet.
+    56→    56→
+    57→    57→Kiwul Storyboard Studio menyelesaikan masalah ini dengan satu workspace produksi storyboard yang terstruktur.
+    58→    58→
+    59→    59→---
+    60→    60→
+    61→    61→## 4. Target User
+    62→    62→
+    63→    63→### 4.1 Primary User
+    64→    64→
+    65→    65→Creator video AI lokal yang membuat:
+    66→    66→
+    67→    67→- YouTube Shorts
+    68→    68→- TikTok
+    69→    69→- Instagram Reels
+    70→    70→- video fakta sains
+    71→    71→- video edukasi
+    72→    72→- video dokumenter pendek
+    73→    73→- micro drama
+    74→    74→- konten faceless
+    75→    75→
+    76→    76→### 4.2 Secondary User
+    77→    77→
+    78→    78→Developer lokal yang membangun pipeline AI dengan:
+    79→    79→
+    80→    80→- Ollama
+    81→    81→- Z-Image
+    82→    82→- F5-TTS
+    83→    83→- WAN
+    84→    84→- LTX
+    85→    85→- ComfyUI
+    86→    86→- FFmpeg
+    87→    87→- Next.js
+    88→    88→- SQLite / Prisma
+    89→    89→
+    90→    90→---
+    91→    91→
+    92→    92→## 5. Scope Produk
+    93→    93→
+    94→    94→### 5.1 In Scope
+    95→    95→
+    96→    96→Fitur yang masuk versi awal:
+    97→    97→
+    98→    98→1. Load JSON storyboard.
+    99→    99→2. Validasi JSON.
+   100→   100→3. Tampilkan project info.
+   101→   101→4. Tampilkan scene list.
+   102→   102→5. Tampilkan detail scene.
+   103→   103→6. Edit VO.
+   104→   104→7. Edit image prompt.
+   105→   105→8. Edit video prompt.
+   106→   106→9. Edit negative prompt.
+   107→   107→10. Pilih aspect ratio `9:16` atau `16:9`.
+   108→   108→11. Validasi durasi total `30–900 detik`.
+   109→   109→12. Generate image per scene.
+   110→   110→13. Generate video per scene.
+   111→   111→14. Generate all images.
+   112→   112→15. Generate all videos.
+   113→   113→16. Generate all image + video.
+   114→   114→17. Sistem queue.
+   115→   115→18. Sistem polling.
+   116→   116→19. Preview image.
+   117→   117→20. Preview video.
+   118→   118→21. Download image per scene.
+   119→   119→22. Download video per scene.
+   120→   120→23. Download all images sebagai ZIP.
+   121→   121→24. Download all videos sebagai ZIP.
+   122→   122→25. Export JSON final.
+   123→   123→26. Provider settings untuk image dan video.
+   124→   124→27. Test connection provider.
+   125→   125→28. Lock scene.
+   126→   126→29. Retry failed scene.
+   127→   127→30. Skip locked scene pada batch generate.
+   128→   128→
+   129→   129→### 5.2 Out of Scope untuk MVP
+   130→   130→
+   131→   131→Tidak wajib di versi awal:
+   132→   132→
+   133→   133→1. Ide generation otomatis.
+   134→   134→2. Script generation otomatis.
+   135→   135→3. Storyline generator otomatis.
+   136→   136→4. Character builder kompleks.
+   137→   137→5. TTS generator.
+   138→   138→6. Subtitle generator.
+   139→   139→7. Final video composer.
+   140→   140→8. Upload otomatis ke YouTube/TikTok.
+   141→   141→9. Multi-user SaaS.
+   142→   142→10. Payment system.
+   143→   143→11. Cloud storage.
+   144→   144→
+   145→   145→---
+   146→   146→
+   147→   147→## 6. Konsep Utama
+   148→   148→
+   149→   149→Program bekerja dengan konsep:
+   150→   150→
+   151→   151→```text
+   152→   152→JSON Storyboard
+   153→   153→    ↓
+   154→   154→Scene List
+   155→   155→    ↓
+   156→   156→VO + Image Prompt + Video Prompt
+   157→   157→    ↓
+   158→   158→Generate Image
+   159→   159→    ↓
+   160→   160→Generate Video
+   161→   161→    ↓
+   162→   162→Preview + Download
+   163→   163→    ↓
+   164→   164→Export JSON Final
+   165→   165→```
+   166→   166→
+   167→   167→---
+   168→   168→
+   169→   169→## 7. Format JSON Input
+   170→   170→
+   171→   171→Program harus menerima JSON dengan struktur minimal seperti ini:
+   172→   172→
+   173→   173→```json
+   174→   174→{
+   175→   175→  "project": {
+   176→   176→    "title": "Judul Video",
+   177→   177→    "language": "id",
+   178→   178→    "aspect_ratio": "9:16",
+   179→   179→    "resolution": "1080x1920",
+   180→   180→    "duration_seconds": 60,
+   181→   181→    "style": "cinematic realistic",
+   182→   182→    "target_platform": "youtube_shorts"
+   183→   183→  },
+   184→   184→  "scenes": [
+   185→   185→    {
+   186→   186→      "scene_id": "scene_001",
+   187→   187→      "scene_number": 1,
+   188→   188→      "duration": 3,
+   189→   189→      "vo": "Bayangkan jika mimpi manusia bisa direkam.",
+   190→   190→      "image_prompt": "cinematic realistic vertical frame, a person waking up in a dark bedroom, soft morning light, mysterious atmosphere",
+   191→   191→      "video_prompt": "slow camera push in, subtle breathing motion, curtains moving gently, cinematic lighting",
+   192→   192→      "negative_prompt": "blurry, low quality, distorted face, extra fingers",
+   193→   193→      "locked": false,
+   194→   194→      "image_status": "pending",
+   195→   195→      "video_status": "pending",
+   196→   196→      "image_path": null,
+   197→   197→      "video_path": null
+   198→   198→    }
+   199→   199→  ]
+   200→   200→}
+   201→   201→```
+   202→   202→
+   203→   203→---
+   204→   204→
+   205→   205→## 8. Field JSON Wajib
+   206→   206→
+   207→   207→Setiap scene wajib memiliki:
+   208→   208→
+   209→   209→```json
+   210→   210→{
+   211→   211→  "scene_id": "string",
+   212→   212→  "scene_number": "number",
+   213→   213→  "duration": "number",
+   214→   214→  "vo": "string",
+   215→   215→  "image_prompt": "string",
+   216→   216→  "video_prompt": "string"
+   217→   217→}
+   218→   218→```
+   219→   219→
+   220→   220→---
+   221→   221→
+   222→   222→## 9. Field JSON Opsional
+   223→   223→
+   224→   224→Setiap scene boleh memiliki:
+   225→   225→
+   226→   226→```json
+   227→   227→{
+   228→   228→  "negative_prompt": "string",
+   229→   229→  "camera_prompt": "string",
+   230→   230→  "motion_prompt": "string",
+   231→   231→  "style_prompt": "string",
+   232→   232→  "seed": "number",
+   233→   233→  "locked": "boolean",
+   234→   234→  "image_path": "string | null",
+   235→   235→  "video_path": "string | null",
+   236→   236→  "audio_path": "string | null",
+   237→   237→  "image_status": "string",
+   238→   238→  "video_status": "string",
+   239→   239→  "error_message": "string | null"
+   240→   240→}
+   241→   241→```
+   242→   242→
+   243→   243→---
+   244→   244→
+   245→   245→## 10. Aspect Ratio dan Resolution
+   246→   246→
+   247→   247→Program harus mendukung dua aspect ratio utama:
+   248→   248→
+   249→   249→```text
+   250→   250→9:16
+   251→   251→16:9
+   252→   252→```
+   253→   253→
+   254→   254→### 10.1 Preset 9:16
+   255→   255→
+   256→   256→Digunakan untuk:
+   257→   257→
+   258→   258→- TikTok
+   259→   259→- Reels
+   260→   260→- YouTube Shorts
+   261→   261→
+   262→   262→Preset resolution:
+   263→   263→
+   264→   264→```text
+   265→   265→480x832
+   266→   266→720x1280
+   267→   267→1080x1920
+   268→   268→```
+   269→   269→
+   270→   270→Default:
+   271→   271→
+   272→   272→```text
+   273→   273→1080x1920
+   274→   274→```
+   275→   275→
+   276→   276→Untuk engine lokal ringan, default teknis bisa:
+   277→   277→
+   278→   278→```text
+   279→   279→480x832
+   280→   280→```
+   281→   281→
+   282→   282→### 10.2 Preset 16:9
+   283→   283→
+   284→   284→Digunakan untuk:
+   285→   285→
+   286→   286→- YouTube long form
+   287→   287→- video horizontal
+   288→   288→- presentasi
+   289→   289→- cinematic landscape
+   290→   290→
+   291→   291→Preset resolution:
+   292→   292→
+   293→   293→```text
+   294→   294→832x480
+   295→   295→1280x720
+   296→   296→1920x1080
+   297→   297→```
+   298→   298→
+   299→   299→Default:
+   300→   300→
+   301→   301→```text
+   302→   302→1920x1080
+   303→   303→```
+   304→   304→
+   305→   305→Untuk engine lokal ringan, default teknis bisa:
+   306→   306→
+   307→   307→```text
+   308→   308→832x480
+   309→   309→```
+   310→   310→
+   311→   311→---
+   312→   312→
+   313→   313→## 11. Durasi Project
+   314→   314→
+   315→   315→Program harus mendukung durasi total:
+   316→   316→
+   317→   317→```text
+   318→   318→Minimum: 30 detik
+   319→   319→Maximum: 15 menit
+   320→   320→```
+   321→   321→
+   322→   322→Dalam satuan detik:
+   323→   323→
+   324→   324→```text
+   325→   325→30 sampai 900 detik
+   326→   326→```
+   327→   327→
+   328→   328→Durasi total bisa berasal dari:
+   329→   329→
+   330→   330→1. `project.duration_seconds`
+   331→   331→2. hasil penjumlahan semua `scene.duration`
+   332→   332→
+   333→   333→Jika keduanya ada, sistem membandingkan keduanya. Jika berbeda, tampilkan warning:
+   334→   334→
+   335→   335→```text
+   336→   336→Durasi project tidak sama dengan total durasi scene.
+   337→   337→```
+   338→   338→
+   339→   339→Jika durasi kurang dari 30 detik:
+   340→   340→
+   341→   341→```text
+   342→   342→Warning: durasi terlalu pendek. Minimum 30 detik.
+   343→   343→```
+   344→   344→
+   345→   345→Jika durasi lebih dari 900 detik:
+   346→   346→
+   347→   347→```text
+   348→   348→Warning: durasi terlalu panjang. Maximum 15 menit.
+   349→   349→```
+   350→   350→
+   351→   351→---
+   352→   352→
+   353→   353→## 12. Jumlah Scene
+   354→   354→
+   355→   355→Jumlah scene mengikuti isi JSON.
+   356→   356→
+   357→   357→Tidak boleh ada batas hardcoded seperti 10, 20, atau 30 scene.
+   358→   358→
+   359→   359→Aturan:
+   360→   360→
+   361→   361→1. Minimal 1 scene.
+   362→   362→2. Maksimal tidak dibatasi secara hardcoded.
+   363→   363→3. UI harus tetap bisa scroll untuk scene banyak.
+   364→   364→4. Scene bisa diurutkan berdasarkan `scene_number`.
+   365→   365→5. Jika `scene_number` kosong, sistem bisa membuat nomor otomatis.
+   366→   366→6. Jika ada `scene_id` duplikat, load JSON harus gagal atau memberi warning keras.
+   367→   367→
+   368→   368→---
+   369→   369→
+   370→   370→## 13. Status Scene
+   371→   371→
+   372→   372→Status image dan video dipisah.
+   373→   373→
+   374→   374→### 13.1 Image Status
+   375→   375→
+   376→   376→```text
+   377→   377→pending
+   378→   378→queued
+   379→   379→running
+   380→   380→completed
+   381→   381→failed
+   382→   382→skipped
+   383→   383→```
+   384→   384→
+   385→   385→### 13.2 Video Status
+   386→   386→
+   387→   387→```text
+   388→   388→pending
+   389→   389→queued
+   390→   390→running
+   391→   391→completed
+   392→   392→failed
+   393→   393→skipped
+   394→   394→```
+   395→   395→
+   396→   396→### 13.3 Scene Lock
+   397→   397→
+   398→   398→Jika scene dikunci:
+   399→   399→
+   400→   400→```json
+   401→   401→{
+   402→   402→  "locked": true
+   403→   403→}
+   404→   404→```
+   405→   405→
+   406→   406→Maka scene tidak ikut batch regenerate.
+   407→   407→
+   408→   408→---
+   409→   409→
+   410→   410→## 14. UI Utama
+   411→   411→
+   412→   412→UI terdiri dari empat area:
+   413→   413→
+   414→   414→### 14.1 Top Toolbar
+   415→   415→
+   416→   416→Berisi tombol:
+   417→   417→
+   418→   418→```text
+   419→   419→Load JSON
+   420→   420→Save
+   421→   421→Export JSON
+   422→   422→Provider Settings
+   423→   423→Generate All Images
+   424→   424→Generate All Videos
+   425→   425→Generate All
+   426→   426→Generate Failed Only
+   427→   427→Pause
+   428→   428→Stop
+   429→   429→Download Project ZIP
+   430→   430→```
+   431→   431→
+   432→   432→### 14.2 Sidebar Scene List
+   433→   433→
+   434→   434→Menampilkan daftar scene:
+   435→   435→
+   436→   436→```text
+   437→   437→Scene 01 — image completed — video pending
+   438→   438→Scene 02 — image running — video pending
+   439→   439→Scene 03 — image failed — video skipped
+   440→   440→```
+   441→   441→
+   442→   442→### 14.3 Scene Detail Panel
+   443→   443→
+   444→   444→Menampilkan dan mengedit:
+   445→   445→
+   446→   446→- VO
+   447→   447→- image prompt
+   448→   448→- video prompt
+   449→   449→- negative prompt
+   450→   450→- duration
+   451→   451→- seed
+   452→   452→- locked
+   453→   453→- status
+   454→   454→- error message
+   455→   455→
+   456→   456→### 14.4 Preview Panel
+   457→   457→
+   458→   458→Menampilkan:
+   459→   459→
+   460→   460→- image preview
+   461→   461→- video preview
+   462→   462→- download image
+   463→   463→- download video
+   464→   464→- regenerate image
+   465→   465→- regenerate video
+   466→   466→
+   467→   467→---
+   468→   468→
+   469→   469→## 15. Scene Card Requirement
+   470→   470→
+   471→   471→Setiap scene card minimal menampilkan:
+   472→   472→
+   473→   473→```text
+   474→   474→Scene 01
+   475→   475→Duration: 3s
+   476→   476→VO preview
+   477→   477→Image Status: completed
+   478→   478→Video Status: pending
+   479→   479→[Generate Image]
+   480→   480→[Generate Video]
+   481→   481→[Download Image]
+   482→   482→[Download Video]
+   483→   483→[Lock]
+   484→   484→```
+   485→   485→
+   486→   486→Jika image belum ada, tombol Download Image disabled.
+   487→   487→
+   488→   488→Jika video belum ada, tombol Download Video disabled.
+   489→   489→
+   490→   490→---
+   491→   491→
+   492→   492→## 16. Generate Image per Scene
+   493→   493→
+   494→   494→Saat user klik **Generate Image**, sistem:
+   495→   495→
+   496→   496→1. Mengecek scene tidak terkunci.
+   497→   497→2. Membaca `image_prompt`.
+   498→   498→3. Membaca `negative_prompt`.
+   499→   499→4. Membaca aspect ratio dan resolution.
+   500→   500→5. Mengirim request ke image provider.
+   501→   501→6. Menyimpan hasil ke folder project.
+   502→   502→7. Update `image_path`.
+   503→   503→8. Update `image_status = completed`.
+   504→   504→9. Menampilkan preview image.
+   505→   505→10. Mengaktifkan tombol download image.
+   506→   506→
+   507→   507→Output file:
+   508→   508→
+   509→   509→```text
+   510→   510→outputs/projects/{project_id}/images/{scene_id}.png
+   511→   511→```
+   512→   512→
+   513→   513→---
+   514→   514→
+   515→   515→## 17. Generate Video per Scene
+   516→   516→
+   517→   517→Saat user klik **Generate Video**, sistem:
+   518→   518→
+   519→   519→1. Mengecek scene tidak terkunci.
+   520→   520→2. Mengecek image sudah ada.
+   521→   521→3. Membaca `image_path`.
+   522→   522→4. Membaca `video_prompt`.
+   523→   523→5. Membaca duration.
+   524→   524→6. Membaca aspect ratio.
+   525→   525→7. Mengirim request ke video provider.
+   526→   526→8. Menyimpan hasil ke folder project.
+   527→   527→9. Update `video_path`.
+   528→   528→10. Update `video_status = completed`.
+   529→   529→11. Menampilkan preview video.
+   530→   530→12. Mengaktifkan tombol download video.
+   531→   531→
+   532→   532→Output file:
+   533→   533→
+   534→   534→```text
+   535→   535→outputs/projects/{project_id}/videos/{scene_id}.mp4
+   536→   536→```
+   537→   537→
+   538→   538→---
+   539→   539→
+   540→   540→## 18. Generate All
+   541→   541→
+   542→   542→Program wajib memiliki tombol:
+   543→   543→
+   544→   544→```text
+   545→   545→Generate All Images
+   546→   546→Generate All Videos
+   547→   547→Generate All Image + Video
+   548→   548→Generate Failed Only
+   549→   549→```
+   550→   550→
+   551→   551→### 18.1 Generate All Images
+   552→   552→
+   553→   553→Generate image untuk semua scene yang:
+   554→   554→
+   555→   555→```text
+   556→   556→image_status != completed
+   557→   557→locked = false
+   558→   558→```
+   559→   559→
+   560→   560→### 18.2 Generate All Videos
+   561→   561→
+   562→   562→Generate video untuk semua scene yang:
+   563→   563→
+   564→   564→```text
+   565→   565→image_status = completed
+   566→   566→video_status != completed
+   567→   567→locked = false
+   568→   568→```
+   569→   569→
+   570→   570→### 18.3 Generate All Image + Video
+   571→   571→
+   572→   572→Mode ini menjalankan pipeline lengkap:
+   573→   573→
+   574→   574→```text
+   575→   575→Scene 1 image → Scene 1 video
+   576→   576→Scene 2 image → Scene 2 video
+   577→   577→Scene 3 image → Scene 3 video
+   578→   578→```
+   579→   579→
+   580→   580→Untuk MVP, gunakan sequential agar aman untuk GPU lokal.
+   581→   581→
+   582→   582→---
+   583→   583→
+   584→   584→## 19. Queue System
+   585→   585→
+   586→   586→Generate All harus memakai queue.
+   587→   587→
+   588→   588→Saat user klik Generate All, backend membuat job:
+   589→   589→
+   590→   590→```json
+   591→   591→{
+   592→   592→  "job_id": "job_001",
+   593→   593→  "project_id": "project_001",
+   594→   594→  "type": "generate_all",
+   595→   595→  "status": "running",
+   596→   596→  "total_tasks": 40,
+   597→   597→  "completed_tasks": 0,
+   598→   598→  "failed_tasks": 0
+   599→   599→}
+   600→   600→```
+   601→   601→
+   602→   602→Setiap task:
+   603→   603→
+   604→   604→```json
+   605→   605→{
+   606→   606→  "task_id": "task_001",
+   607→   607→  "job_id": "job_001",
+   608→   608→  "scene_id": "scene_001",
+   609→   609→  "task_type": "image",
+   610→   610→  "status": "queued"
+   611→   611→}
+   612→   612→```
+   613→   613→
+   614→   614→Task status:
+   615→   615→
+   616→   616→```text
+   617→   617→queued
+   618→   618→running
+   619→   619→completed
+   620→   620→failed
+   621→   621→skipped
+   622→   622→cancelled
+   623→   623→```
+   624→   624→
+   625→   625→---
+   626→   626→
+   627→   627→## 20. Polling System
+   628→   628→
+   629→   629→Frontend melakukan polling ke backend setiap 2–5 detik:
+   630→   630→
+   631→   631→```http
+   632→   632→GET /api/storyboard/jobs/{job_id}
+   633→   633→```
+   634→   634→
+   635→   635→Response:
+   636→   636→
+   637→   637→```json
+   638→   638→{
+   639→   639→  "job_id": "job_001",
+   640→   640→  "status": "running",
+   641→   641→  "progress": {
+   642→   642→    "total_tasks": 40,
+   643→   643→    "completed_tasks": 13,
+   644→   644→    "failed_tasks": 1,
+   645→   645→    "queued_tasks": 26,
+   646→   646→    "running_tasks": 1
+   647→   647→  },
+   648→   648→  "updated_scenes": [
+   649→   649→    {
+   650→   650→      "scene_id": "scene_003",
+   651→   651→      "image_status": "completed",
+   652→   652→      "video_status": "completed",
+   653→   653→      "image_path": "/api/assets/projects/project_001/images/scene_003.png",
+   654→   654→      "video_path": "/api/assets/projects/project_001/videos/scene_003.mp4"
+   655→   655→    }
+   656→   656→  ]
+   657→   657→}
+   658→   658→```
+   659→   659→
+   660→   660→UI harus langsung update scene yang selesai tanpa menunggu semua task selesai.
+   661→   661→
+   662→   662→---
+   663→   663→
+   664→   664→## 21. Hasil Muncul Langsung
+   665→   665→
+   666→   666→Jika satu scene selesai generate image:
+   667→   667→
+   668→   668→1. Scene card langsung update.
+   669→   669→2. Preview image muncul.
+   670→   670→3. Download image aktif.
+   671→   671→
+   672→   672→Jika satu scene selesai generate video:
+   673→   673→
+   674→   674→1. Scene card langsung update.
+   675→   675→2. Preview video muncul.
+   676→   676→3. Download video aktif.
+   677→   677→
+   678→   678→Program tidak boleh menunggu semua scene selesai baru menampilkan hasil.
+   679→   679→
+   680→   680→---
+   681→   681→
+   682→   682→## 22. Stop, Pause, Resume
+   683→   683→
+   684→   684→### 22.1 Stop
+   685→   685→
+   686→   686→Menghentikan job yang sedang berjalan.
+   687→   687→
+   688→   688→```http
+   689→   689→POST /api/storyboard/jobs/{job_id}/stop
+   690→   690→```
+   691→   691→
+   692→   692→### 22.2 Pause
+   693→   693→
+   694→   694→Menunda task berikutnya, tetapi tidak membatalkan task yang sedang running.
+   695→   695→
+   696→   696→```http
+   697→   697→POST /api/storyboard/jobs/{job_id}/pause
+   698→   698→```
+   699→   699→
+   700→   700→### 22.3 Resume
+   701→   701→
+   702→   702→Melanjutkan task yang masih queued.
+   703→   703→
+   704→   704→```http
+   705→   705→POST /api/storyboard/jobs/{job_id}/resume
+   706→   706→```
+   707→   707→
+   708→   708→---
+   709→   709→
+   710→   710→## 23. Provider Settings
+   711→   711→
+   712→   712→Program wajib memiliki halaman Provider Settings untuk:
+   713→   713→
+   714→   714→1. Image Provider
+   715→   715→2. Video Provider
+   716→   716→
+   717→   717→Provider tidak boleh hardcoded. Semua disimpan ke database/config.
+   718→   718→
+   719→   719→---
+   720→   720→
+   721→   721→## 24. Image Provider
+   722→   722→
+   723→   723→Default lokal:
+   724→   724→
+   725→   725→```json
+   726→   726→{
+   727→   727→  "name": "Z-Image Local",
+   728→   728→  "type": "image",
+   729→   729→  "provider": "openai_image_compatible",
+   730→   730→  "base_url": "http://127.0.0.1:9100",
+   731→   731→  "endpoint": "/v1/images/generations",
+   732→   732→  "model": "z-image-turbo",
+   733→   733→  "api_key": "local",
+   734→   734→  "timeout_seconds": 600,
+   735→   735→  "is_default": true,
+   736→   736→  "is_active": true
+   737→   737→}
+   738→   738→```
+   739→   739→
+   740→   740→UI field:
+   741→   741→
+   742→   742→```text
+   743→   743→Provider Name
+   744→   744→Base URL
+   745→   745→Endpoint
+   746→   746→Model
+   747→   747→API Key
+   748→   748→Timeout
+   749→   749→Test Connection
+   750→   750→Save
+   751→   751→Set as Default
+   752→   752→```
+   753→   753→
+   754→   754→---
+   755→   755→
+   756→   756→## 25. Video Provider
+   757→   757→
+   758→   758→Default lokal:
+   759→   759→
+   760→   760→```json
+   761→   761→{
+   762→   762→  "name": "WAN Local",
+   763→   763→  "type": "video",
+   764→   764→  "provider": "openai_video_compatible",
+   765→   765→  "base_url": "http://127.0.0.1:9201",
+   766→   766→  "endpoint": "/v1/videos/generations",
+   767→   767→  "model": "wan-i2v",
+   768→   768→  "api_key": "local",
+   769→   769→  "timeout_seconds": 1800,
+   770→   770→  "is_default": true,
+   771→   771→  "is_active": true
+   772→   772→}
+   773→   773→```
+   774→   774→
+   775→   775→Fallback lokal:
+   776→   776→
+   777→   777→```json
+   778→   778→{
+   779→   779→  "name": "LTX Local",
+   780→   780→  "type": "video",
+   781→   781→  "provider": "openai_video_compatible",
+   782→   782→  "base_url": "http://127.0.0.1:9200",
+   783→   783→  "endpoint": "/v1/videos/generations",
+   784→   784→  "model": "ltx-i2v",
+   785→   785→  "api_key": "local",
+   786→   786→  "timeout_seconds": 1800,
+   787→   787→  "is_default": false,
+   788→   788→  "is_active": true
+   789→   789→}
+   790→   790→```
+   791→   791→
+   792→   792→---
+   793→   793→
+   794→   794→## 26. Test Connection Provider
+   795→   795→
+   796→   796→Provider settings harus punya tombol **Test Connection**.
+   797→   797→
+   798→   798→### 26.1 Image Test
+   799→   799→
+   800→   800→Coba endpoint:
+   801→   801→
+   802→   802→```http
+   803→   803→GET {base_url}/v1/models
+   804→   804→```
+   805→   805→
+   806→   806→Jika berhasil:
+   807→   807→
+   808→   808→```json
+   809→   809→{
+   810→   810→  "ok": true,
+   811→   811→  "message": "Image provider connected"
+   812→   812→}
+   813→   813→```
+   814→   814→
+   815→   815→Jika gagal:
+   816→   816→
+   817→   817→```json
+   818→   818→{
+   819→   819→  "ok": false,
+   820→   820→  "message": "Connection failed"
+   821→   821→}
+   822→   822→```
+   823→   823→
+   824→   824→### 26.2 Video Test
+   825→   825→
+   826→   826→Coba endpoint:
+   827→   827→
+   828→   828→```http
+   829→   829→GET {base_url}/v1/models
+   830→   830→```
+   831→   831→
+   832→   832→Jika provider tidak punya `/v1/models`, coba:
+   833→   833→
+   834→   834→```http
+   835→   835→GET {base_url}/health
+   836→   836→```
+   837→   837→
+   838→   838→---
+   839→   839→
+   840→   840→## 27. API Design
+   841→   841→
+   842→   842→### 27.1 Load JSON
+   843→   843→
+   844→   844→```http
+   845→   845→POST /api/storyboard/load
+   846→   846→```
+   847→   847→
+   848→   848→Body:
+   849→   849→
+   850→   850→```json
+   851→   851→{
+   852→   852→  "json": {}
+   853→   853→}
+   854→   854→```
+   855→   855→
+   856→   856→Response:
+   857→   857→
+   858→   858→```json
+   859→   859→{
+   860→   860→  "ok": true,
+   861→   861→  "project_id": "project_001",
+   862→   862→  "scenes": []
+   863→   863→}
+   864→   864→```
+   865→   865→
+   866→   866→---
+   867→   867→
+   868→   868→### 27.2 Get Project
+   869→   869→
+   870→   870→```http
+   871→   871→GET /api/storyboard/{project_id}
+   872→   872→```
+   873→   873→
+   874→   874→Response:
+   875→   875→
+   876→   876→```json
+   877→   877→{
+   878→   878→  "project": {},
+   879→   879→  "scenes": []
+   880→   880→}
+   881→   881→```
+   882→   882→
+   883→   883→---
+   884→   884→
+   885→   885→### 27.3 Update Scene
+   886→   886→
+   887→   887→```http
+   888→   888→PATCH /api/storyboard/{project_id}/scenes/{scene_id}
+   889→   889→```
+   890→   890→
+   891→   891→Body:
+   892→   892→
+   893→   893→```json
+   894→   894→{
+   895→   895→  "vo": "...",
+   896→   896→  "image_prompt": "...",
+   897→   897→  "video_prompt": "...",
+   898→   898→  "negative_prompt": "...",
+   899→   899→  "locked": false
+   900→   900→}
+   901→   901→```
+   902→   902→
+   903→   903→---
+   904→   904→
+   905→   905→### 27.4 Generate Image
+   906→   906→
+   907→   907→```http
+   908→   908→POST /api/storyboard/{project_id}/scenes/{scene_id}/image
+   909→   909→```
+   910→   910→
+   911→   911→Response:
+   912→   912→
+   913→   913→```json
+   914→   914→{
+   915→   915→  "ok": true,
+   916→   916→  "image_path": "/api/assets/projects/project_001/images/scene_001.png"
+   917→   917→}
+   918→   918→```
+   919→   919→
+   920→   920→---
+   921→   921→
+   922→   922→### 27.5 Generate Video
+   923→   923→
+   924→   924→```http
+   925→   925→POST /api/storyboard/{project_id}/scenes/{scene_id}/video
+   926→   926→```
+   927→   927→
+   928→   928→Response:
+   929→   929→
+   930→   930→```json
+   931→   931→{
+   932→   932→  "ok": true,
+   933→   933→  "video_path": "/api/assets/projects/project_001/videos/scene_001.mp4"
+   934→   934→}
+   935→   935→```
+   936→   936→
+   937→   937→---
+   938→   938→
+   939→   939→### 27.6 Generate All
+   940→   940→
+   941→   941→```http
+   942→   942→POST /api/storyboard/{project_id}/generate-all
+   943→   943→```
+   944→   944→
+   945→   945→Body:
+   946→   946→
+   947→   947→```json
+   948→   948→{
+   949→   949→  "mode": "image_and_video",
+   950→   950→  "skip_locked": true,
+   951→   951→  "failed_only": false,
+   952→   952→  "concurrency": {
+   953→   953→    "image": 1,
+   954→   954→    "video": 1
+   955→   955→  }
+   956→   956→}
+   957→   957→```
+   958→   958→
+   959→   959→Response:
+   960→   960→
+   961→   961→```json
+   962→   962→{
+   963→   963→  "ok": true,
+   964→   964→  "job_id": "job_001"
+   965→   965→}
+   966→   966→```
+   967→   967→
+   968→   968→---
+   969→   969→
+   970→   970→### 27.7 Poll Job
+   971→   971→
+   972→   972→```http
+   973→   973→GET /api/storyboard/jobs/{job_id}
+   974→   974→```
+   975→   975→
+   976→   976→---
+   977→   977→
+   978→   978→### 27.8 Stop Job
+   979→   979→
+   980→   980→```http
+   981→   981→POST /api/storyboard/jobs/{job_id}/stop
+   982→   982→```
+   983→   983→
+   984→   984→---
+   985→   985→
+   986→   986→### 27.9 Export JSON
+   987→   987→
+   988→   988→```http
+   989→   989→GET /api/storyboard/{project_id}/export
+   990→   990→```
+   991→   991→
+   992→   992→---
+   993→   993→
+   994→   994→### 27.10 Download Image
+   995→   995→
+   996→   996→```http
+   997→   997→GET /api/storyboard/{project_id}/scenes/{scene_id}/download/image
+   998→   998→```
+   999→   999→
+  1000→  1000→---
+  1001→  1001→
+  1002→  1002→### 27.11 Download Video
+  1003→  1003→
+  1004→  1004→```http
+  1005→  1005→GET /api/storyboard/{project_id}/scenes/{scene_id}/download/video
+  1006→  1006→```
+  1007→  1007→
+  1008→  1008→---
+  1009→  1009→
+  1010→  1010→### 27.12 Download ZIP
+  1011→  1011→
+  1012→  1012→```http
+  1013→  1013→GET /api/storyboard/{project_id}/download/images.zip
+  1014→  1014→GET /api/storyboard/{project_id}/download/videos.zip
+  1015→  1015→GET /api/storyboard/{project_id}/download/project.zip
+  1016→  1016→```
+  1017→  1017→
+  1018→  1018→---
+  1019→  1019→
+  1020→  1020→## 28. Folder Output
+  1021→  1021→
+  1022→  1022→Struktur folder:
+  1023→  1023→
+  1024→  1024→```text
+  1025→  1025→outputs/
+  1026→  1026→  storyboard/
+  1027→  1027→    {project_id}/
+  1028→  1028→      storyboard_original.json
+  1029→  1029→      storyboard_final.json
+  1030→  1030→      images/
+  1031→  1031→        scene_001.png
+  1032→  1032→        scene_002.png
+  1033→  1033→      videos/
+  1034→  1034→        scene_001.mp4
+  1035→  1035→        scene_002.mp4
+  1036→  1036→      exports/
+  1037→  1037→        images.zip
+  1038→  1038→        videos.zip
+  1039→  1039→        project.zip
+  1040→  1040→```
+  1041→  1041→
+  1042→  1042→---
+  1043→  1043→
+  1044→  1044→## 29. Download Requirement
+  1045→  1045→
+  1046→  1046→Setiap scene wajib memiliki tombol:
+  1047→  1047→
+  1048→  1048→```text
+  1049→  1049→Download Image
+  1050→  1050→Download Video
+  1051→  1051→```
+  1052→  1052→
+  1053→  1053→Batch download:
+  1054→  1054→
+  1055→  1055→```text
+  1056→  1056→Download All Images ZIP
+  1057→  1057→Download All Videos ZIP
+  1058→  1058→Download Project ZIP
+  1059→  1059→```
+  1060→  1060→
+  1061→  1061→Nama file download:
+  1062→  1062→
+  1063→  1063→```text
+  1064→  1064→scene_001_image.png
+  1065→  1065→scene_001_video.mp4
+  1066→  1066→```
+  1067→  1067→
+  1068→  1068→ZIP project berisi:
+  1069→  1069→
+  1070→  1070→```text
+  1071→  1071→project_title/
+  1072→  1072→  storyboard_original.json
+  1073→  1073→  storyboard_final.json
+  1074→  1074→  images/
+  1075→  1075→    scene_001.png
+  1076→  1076→  videos/
+  1077→  1077→    scene_001.mp4
+  1078→  1078→```
+  1079→  1079→
+  1080→  1080→---
+  1081→  1081→
+  1082→  1082→## 30. Export JSON Final
+  1083→  1083→
+  1084→  1084→JSON final harus berisi semua data project, provider, prompt, status, dan output path.
+  1085→  1085→
+  1086→  1086→```json
+  1087→  1087→{
+  1088→  1088→  "project": {
+  1089→  1089→    "title": "Judul Video",
+  1090→  1090→    "language": "id",
+  1091→  1091→    "aspect_ratio": "9:16",
+  1092→  1092→    "resolution": "1080x1920",
+  1093→  1093→    "duration_seconds": 180,
+  1094→  1094→    "providers": {
+  1095→  1095→      "image": {
+  1096→  1096→        "name": "Z-Image Local",
+  1097→  1097→        "base_url": "http://127.0.0.1:9100",
+  1098→  1098→        "model": "z-image-turbo"
+  1099→  1099→      },
+  1100→  1100→      "video": {
+  1101→  1101→        "name": "WAN Local",
+  1102→  1102→        "base_url": "http://127.0.0.1:9201",
+  1103→  1103→        "model": "wan-i2v"
+  1104→  1104→      }
+  1105→  1105→    }
+  1106→  1106→  },
+  1107→  1107→  "scenes": [
+  1108→  1108→    {
+  1109→  1109→      "scene_id": "scene_001",
+  1110→  1110→      "scene_number": 1,
+  1111→  1111→      "duration": 3,
+  1112→  1112→      "vo": "Bayangkan jika mimpi manusia bisa direkam.",
+  1113→  1113→      "image_prompt": "...",
+  1114→  1114→      "video_prompt": "...",
+  1115→  1115→      "negative_prompt": "...",
+  1116→  1116→      "image_status": "completed",
+  1117→  1117→      "video_status": "completed",
+  1118→  1118→      "image_path": "/api/assets/storyboard/project_001/images/scene_001.png",
+  1119→  1119→      "video_path": "/api/assets/storyboard/project_001/videos/scene_001.mp4",
+  1120→  1120→      "locked": false
+  1121→  1121→    }
+  1122→  1122→  ]
+  1123→  1123→}
+  1124→  1124→```
+  1125→  1125→
+  1126→  1126→---
+  1127→  1127→
+  1128→  1128→## 31. Database Schema Prisma
+  1129→  1129→
+  1130→  1130→```prisma
+  1131→  1131→model StoryboardProject {
+  1132→  1132→  id               String   @id @default(cuid())
+  1133→  1133→  title            String
+  1134→  1134→  language         String   @default("id")
+  1135→  1135→  aspect_ratio     String   @default("9:16")
+  1136→  1136→  resolution       String   @default("1080x1920")
+  1137→  1137→  duration_seconds Int?
+  1138→  1138→  style            String?
+  1139→  1139→  status           String   @default("draft")
+  1140→  1140→  json_path        String?
+  1141→  1141→  final_json_path  String?
+  1142→  1142→  created_at       DateTime @default(now())
+  1143→  1143→  updated_at       DateTime @updatedAt
+  1144→  1144→
+  1145→  1145→  scenes           StoryboardScene[]
+  1146→  1146→  jobs             StoryboardJob[]
+  1147→  1147→}
+  1148→  1148→
+  1149→  1149→model StoryboardScene {
+  1150→  1150→  id              String   @id @default(cuid())
+  1151→  1151→  project_id      String
+  1152→  1152→  scene_id        String
+  1153→  1153→  scene_number    Int
+  1154→  1154→  duration        Int
+  1155→  1155→  vo              String
+  1156→  1156→  image_prompt    String
+  1157→  1157→  video_prompt    String
+  1158→  1158→  negative_prompt String?
+  1159→  1159→  image_path      String?
+  1160→  1160→  video_path      String?
+  1161→  1161→  image_status    String   @default("pending")
+  1162→  1162→  video_status    String   @default("pending")
+  1163→  1163→  locked          Boolean  @default(false)
+  1164→  1164→  error_message   String?
+  1165→  1165→  created_at      DateTime @default(now())
+  1166→  1166→  updated_at      DateTime @updatedAt
+  1167→  1167→
+  1168→  1168→  project StoryboardProject @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  1169→  1169→
+  1170→  1170→  @@unique([project_id, scene_id])
+  1171→  1171→}
+  1172→  1172→
+  1173→  1173→model StoryboardProvider {
+  1174→  1174→  id              String   @id @default(cuid())
+  1175→  1175→  type            String
+  1176→  1176→  name            String
+  1177→  1177→  provider        String
+  1178→  1178→  base_url        String
+  1179→  1179→  endpoint        String?
+  1180→  1180→  model           String
+  1181→  1181→  api_key         String?
+  1182→  1182→  config_json     String   @default("{}")
+  1183→  1183→  is_default      Boolean  @default(false)
+  1184→  1184→  is_active       Boolean  @default(true)
+  1185→  1185→  timeout_seconds Int      @default(600)
+  1186→  1186→  created_at      DateTime @default(now())
+  1187→  1187→  updated_at      DateTime @updatedAt
+  1188→  1188→}
+  1189→  1189→
+  1190→  1190→model StoryboardJob {
+  1191→  1191→  id              String   @id @default(cuid())
+  1192→  1192→  project_id      String
+  1193→  1193→  type            String
+  1194→  1194→  status          String   @default("queued")
+  1195→  1195→  total_tasks     Int      @default(0)
+  1196→  1196→  completed_tasks Int      @default(0)
+  1197→  1197→  failed_tasks    Int      @default(0)
+  1198→  1198→  config_json     String   @default("{}")
+  1199→  1199→  error_message   String?
+  1200→  1200→  created_at      DateTime @default(now())
+  1201→  1201→  updated_at      DateTime @updatedAt
+  1202→  1202→
+  1203→  1203→  project         StoryboardProject @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  1204→  1204→  tasks           StoryboardTask[]
+  1205→  1205→}
+  1206→  1206→
+  1207→  1207→model StoryboardTask {
+  1208→  1208→  id            String   @id @default(cuid())
+  1209→  1209→  job_id        String
+  1210→  1210→  scene_id      String
+  1211→  1211→  task_type     String
+  1212→  1212→  status        String   @default("queued")
+  1213→  1213→  output_path   String?
+  1214→  1214→  error_message String?
+  1215→  1215→  started_at    DateTime?
+  1216→  1216→  completed_at  DateTime?
+  1217→  1217→  created_at    DateTime @default(now())
+  1218→  1218→  updated_at    DateTime @updatedAt
+  1219→  1219→
+  1220→  1220→  job StoryboardJob @relation(fields: [job_id], references: [id], onDelete: Cascade)
+  1221→  1221→}
+  1222→  1222→```
+  1223→  1223→
+  1224→  1224→---
+  1225→  1225→
+  1226→  1226→## 32. Validasi JSON
+  1227→  1227→
+  1228→  1228→Saat load JSON, sistem wajib mengecek:
+  1229→  1229→
+  1230→  1230→1. JSON valid.
+  1231→  1231→2. `project` ada.
+  1232→  1232→3. `scenes` ada dan berupa array.
+  1233→  1233→4. Minimal 1 scene.
+  1234→  1234→5. Setiap scene punya `scene_id`.
+  1235→  1235→6. Setiap scene punya `vo`.
+  1236→  1236→7. Setiap scene punya `image_prompt`.
+  1237→  1237→8. Setiap scene punya `video_prompt`.
+  1238→  1238→9. Setiap scene punya `duration`.
+  1239→  1239→10. Tidak ada `scene_id` duplikat.
+  1240→  1240→11. `aspect_ratio` hanya `9:16` atau `16:9`.
+  1241→  1241→12. Total durasi antara `30` dan `900` detik.
+  1242→  1242→13. Jika `duration_seconds` tidak cocok dengan total scene, tampilkan warning.
+  1243→  1243→
+  1244→  1244→---
+  1245→  1245→
+  1246→  1246→## 33. Error Handling
+  1247→  1247→
+  1248→  1248→Jika image gagal:
+  1249→  1249→
+  1250→  1250→```json
+  1251→  1251→{
+  1252→  1252→  "image_status": "failed",
+  1253→  1253→  "error_message": "Image provider timeout"
+  1254→  1254→}
+  1255→  1255→```
+  1256→  1256→
+  1257→  1257→Jika video gagal:
+  1258→  1258→
+  1259→  1259→```json
+  1260→  1260→{
+  1261→  1261→  "video_status": "failed",
+  1262→  1262→  "error_message": "Video provider timeout"
+  1263→  1263→}
+  1264→  1264→```
+  1265→  1265→
+  1266→  1266→UI wajib menyediakan:
+  1267→  1267→
+  1268→  1268→```text
+  1269→  1269→Retry
+  1270→  1270→Copy Error
+  1271→  1271→Reset Status
+  1272→  1272→Skip Scene
+  1273→  1273→```
+  1274→  1274→
+  1275→  1275→---
+  1276→  1276→
+  1277→  1277→## 34. UX Requirement
+  1278→  1278→
+  1279→  1279→Prinsip UX:
+  1280→  1280→
+  1281→  1281→1. Sederhana.
+  1282→  1282→2. Semua scene terlihat jelas.
+  1283→  1283→3. Status image/video mudah dibaca.
+  1284→  1284→4. Prompt bisa diedit langsung.
+  1285→  1285→5. Tombol generate dekat dengan prompt.
+  1286→  1286→6. Preview langsung muncul.
+  1287→  1287→7. Download satu klik.
+  1288→  1288→8. Scene gagal mudah ditemukan.
+  1289→  1289→9. Batch generate aman untuk GPU lokal.
+  1290→  1290→10. Tidak ada setting penting yang hardcoded.
+  1291→  1291→
+  1292→  1292→---
+  1293→  1293→
+  1294→  1294→## 35. MVP Requirement
+  1295→  1295→
+  1296→  1296→MVP wajib selesai jika memiliki:
+  1297→  1297→
+  1298→  1298→1. Load JSON.
+  1299→  1299→2. Validasi JSON.
+  1300→  1300→3. Pilih aspect ratio.
+  1301→  1301→4. Validasi durasi 30–900 detik.
+  1302→  1302→5. Scene list fleksibel.
+  1303→  1303→6. Edit VO.
+  1304→  1304→7. Edit image prompt.
+  1305→  1305→8. Edit video prompt.
+  1306→  1306→9. Provider settings image.
+  1307→  1307→10. Provider settings video.
+  1308→  1308→11. Test connection provider.
+  1309→  1309→12. Generate image per scene.
+  1310→  1310→13. Generate video per scene.
+  1311→  1311→14. Generate All.
+  1312→  1312→15. Queue system.
+  1313→  1313→16. Polling progress.
+  1314→  1314→17. Preview image.
+  1315→  1315→18. Preview video.
+  1316→  1316→19. Download image.
+  1317→  1317→20. Download video.
+  1318→  1318→21. Download ZIP.
+  1319→  1319→22. Export JSON final.
+  1320→  1320→
+  1321→  1321→---
+  1322→  1322→
+  1323→  1323→## 36. Future Improvement
+  1324→  1324→
+  1325→  1325→Fitur lanjutan:
+  1326→  1326→
+  1327→  1327→1. Drag and drop reorder scene.
+  1328→  1328→2. Timeline preview.
+  1329→  1329→3. Prompt enhancer.
+  1330→  1330→4. Seed control.
+  1331→  1331→5. Compare hasil regenerate.
+  1332→  1332→6. Character reference injection.
+  1333→  1333→7. TTS generation.
+  1334→  1334→8. Subtitle generation.
+  1335→  1335→9. Final video composer.
+  1336→  1336→10. Upload otomatis ke YouTube.
+  1337→  1337→11. Preset style.
+  1338→  1338→12. Multi-provider fallback.
+  1339→  1339→13. Auto retry.
+  1340→  1340→14. Scene dependency.
+  1341→  1341→15. Render final video.
+  1342→  1342→
+  1343→  1343→---
+  1344→  1344→
+  1345→  1345→## 37. Acceptance Criteria
+  1346→  1346→
+  1347→  1347→Produk dianggap selesai jika:
+  1348→  1348→
+  1349→  1349→1. User bisa load JSON storyboard.
+  1350→  1350→2. User bisa melihat semua scene.
+  1351→  1351→3. User bisa memilih `9:16` atau `16:9`.
+  1352→  1352→4. User bisa memakai durasi 30 detik sampai 15 menit.
+  1353→  1353→5. Jumlah scene mengikuti JSON.
+  1354→  1354→6. User bisa konek image provider dari UI.
+  1355→  1355→7. User bisa konek video provider dari UI.
+  1356→  1356→8. User bisa test provider.
+  1357→  1357→9. User bisa generate image per scene.
+  1358→  1358→10. User bisa generate video per scene.
+  1359→  1359→11. User bisa klik Generate All.
+  1360→  1360→12. Backend membuat job queue.
+  1361→  1361→13. Frontend polling job status.
+  1362→  1362→14. Scene yang selesai langsung muncul hasilnya.
+  1363→  1363→15. User bisa download image.
+  1364→  1364→16. User bisa download video.
+  1365→  1365→17. User bisa download ZIP.
+  1366→  1366→18. User bisa export JSON final.
+  1367→  1367→19. Scene locked tidak ikut batch generate.
+  1368→  1368→20. Scene failed bisa retry.
+  1369→  1369→21. Provider bisa diganti tanpa ubah kode.
+  1370→  1370→
+  1371→  1371→---
+  1372→  1372→
+  1373→  1373→## 38. Kesimpulan
+  1374→  1374→
+  1375→  1375→Kiwul Storyboard Studio adalah modul khusus untuk mengeksekusi storyboard dari JSON menjadi aset image dan video. Modul ini harus ringan, lokal, fleksibel, dan siap terhubung ke provider image/video seperti Z-Image, WAN, LTX, atau provider OpenAI-compatible lain.
+  1376→  1376→
+  1377→  1377→Fokus utama produk ini adalah:
+  1378→  1378→
+  1379→  1379→```text
+  1380→  1380→Load JSON → Scene Editor → Provider Connection → Generate All → Polling → Preview → Download → Export JSON Final
+  1381→  1381→```
+  1382→  1382→
+  1383→  1383→Produk ini menjadi fondasi penting untuk pipeline produksi video AI lokal karena memisahkan tahap storyboard dari tahap ideation, scriptwriting, TTS, subtitle, dan final render.
+  1384→  1384→

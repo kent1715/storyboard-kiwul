@@ -1,0 +1,104 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model StoryboardProject {
+  id               String   @id @default(cuid())
+  title            String
+  language         String   @default("id")
+  aspect_ratio     String   @default("9:16")
+  resolution       String   @default("1080x1920")
+  duration_seconds Int?
+  style            String?
+  target_platform  String?
+  status           String   @default("draft")
+  json_path        String?
+  final_json_path  String?
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  scenes           StoryboardScene[]
+  jobs             StoryboardJob[]
+}
+
+model StoryboardScene {
+  id              String   @id @default(cuid())
+  project_id      String
+  scene_id        String
+  scene_number    Int
+  duration        Int
+  vo              String
+  image_prompt    String
+  video_prompt    String
+  negative_prompt String?
+  image_path      String?
+  video_path      String?
+  image_status    String   @default("pending")
+  video_status    String   @default("pending")
+  locked          Boolean  @default(false)
+  error_message   String?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  project StoryboardProject @relation(fields: [project_id], references: [id], onDelete: Cascade)
+
+  @@unique([project_id, scene_id])
+}
+
+model StoryboardProvider {
+  id              String   @id @default(cuid())
+  type            String   // "image" or "video"
+  name            String
+  provider        String   // "openai_image_compatible" or "openai_video_compatible"
+  base_url        String
+  endpoint        String?
+  model           String
+  api_key         String?
+  config_json     String   @default("{}")
+  is_default      Boolean  @default(false)
+  is_active       Boolean  @default(true)
+  timeout_seconds Int      @default(600)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+}
+
+model StoryboardJob {
+  id              String   @id @default(cuid())
+  project_id      String
+  type            String   // "generate_all_images", "generate_all_videos", "generate_all", "generate_failed"
+  status          String   @default("queued") // "queued", "running", "paused", "stopped", "completed", "failed"
+  total_tasks     Int      @default(0)
+  completed_tasks Int      @default(0)
+  failed_tasks    Int      @default(0)
+  config_json     String   @default("{}")
+  error_message   String?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  project         StoryboardProject @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  tasks           StoryboardTask[]
+}
+
+model StoryboardTask {
+  id            String    @id @default(cuid())
+  job_id        String
+  scene_id      String
+  task_type     String    // "image" or "video"
+  status        String    @default("queued") // "queued", "running", "completed", "failed", "skipped", "cancelled"
+  output_path   String?
+  error_message String?
+  started_at    DateTime?
+  completed_at  DateTime?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  job StoryboardJob @relation(fields: [job_id], references: [id], onDelete: Cascade)
+}
