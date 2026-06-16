@@ -235,8 +235,8 @@ export function ProviderSettingsDialog() {
 
   return (
     <Dialog open={providerSettingsDialogOpen} onOpenChange={setProviderSettingsDialogOpen}>
-      <DialogContent className="sm:max-w-3xl max-h-[85vh] flex flex-col">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-3xl max-h-[85vh] flex flex-col overflow-hidden">
+        <DialogHeader className="shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <Settings className="h-5 w-5 text-emerald-600" />
             Provider Settings
@@ -246,16 +246,16 @@ export function ProviderSettingsDialog() {
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'image' | 'video')}>
-          <TabsList>
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'image' | 'video')} className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          <TabsList className="shrink-0">
             <TabsTrigger value="image">Image Provider</TabsTrigger>
             <TabsTrigger value="video">Video Provider</TabsTrigger>
           </TabsList>
 
-          <div className="mt-3 flex gap-4 min-h-0 flex-1">
+          <div className="mt-3 flex gap-4 min-h-0 flex-1 overflow-hidden">
             {/* Provider List */}
-            <div className="w-56 shrink-0 flex flex-col min-h-0">
-              <div className="flex items-center justify-between mb-2">
+            <div className="w-56 shrink-0 flex flex-col min-h-0 overflow-hidden">
+              <div className="flex items-center justify-between mb-2 shrink-0">
                 <span className="text-xs font-medium text-muted-foreground">
                   {filteredProviders.length} provider{filteredProviders.length !== 1 ? 's' : ''}
                 </span>
@@ -269,7 +269,7 @@ export function ProviderSettingsDialog() {
                   Add
                 </Button>
               </div>
-              <ScrollArea className="flex-1 max-h-60">
+              <ScrollArea className="flex-1 min-h-0">
                 <div className="space-y-1">
                   {filteredProviders.map((provider) => {
                     const isSelected = provider.id === editingId;
@@ -309,9 +309,9 @@ export function ProviderSettingsDialog() {
             <Separator orientation="vertical" className="h-auto" />
 
             {/* Edit Form */}
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 min-h-0 overflow-hidden">
               {(isNew || editingId) ? (
-                <ScrollArea className="max-h-[50vh]">
+                <ScrollArea className="h-full">
                   <div className="space-y-3 pr-2">
                     <div className="space-y-1.5">
                       <Label className="text-xs">Name</Label>
@@ -432,7 +432,7 @@ export function ProviderSettingsDialog() {
           </div>
         </Tabs>
 
-        <DialogFooter>
+        <DialogFooter className="shrink-0">
           {(isNew || editingId) && (
             <>
               <Button variant="outline" onClick={handleCancel} size="sm">
