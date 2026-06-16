@@ -212,6 +212,7 @@ export function ProviderSettingsDialog() {
           base_url: form.base_url,
           type: activeTab,
           api_key: form.api_key,
+          endpoint: form.endpoint || undefined,
         }),
       });
       const data = await res.json();
@@ -388,7 +389,7 @@ export function ProviderSettingsDialog() {
                     <Separator />
 
                     {/* Test Connection */}
-                    <div className="space-y-2">
+                    <div className="space-y-2 pb-2">
                       <Button
                         variant="outline"
                         size="sm"
@@ -401,23 +402,23 @@ export function ProviderSettingsDialog() {
                         ) : (
                           <TestTube2 className="h-3.5 w-3.5" />
                         )}
-                        Test Connection
+                        {testing ? 'Testing...' : 'Test Connection'}
                       </Button>
                       {testResult && (
                         <div
                           className={cn(
-                            'flex items-center gap-2 p-2 rounded text-xs',
+                            'flex items-start gap-2 p-2.5 rounded-md text-xs',
                             testResult.ok
                               ? 'bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-400'
                               : 'bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-400'
                           )}
                         >
                           {testResult.ok ? (
-                            <CheckCircle className="h-3.5 w-3.5" />
+                            <CheckCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
                           ) : (
-                            <XCircle className="h-3.5 w-3.5" />
+                            <XCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
                           )}
-                          {testResult.message}
+                          <span>{testResult.message}</span>
                         </div>
                       )}
                     </div>
