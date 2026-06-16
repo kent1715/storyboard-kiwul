@@ -61,3 +61,13 @@ db/custom.db
 
 # Test files
 test-storyboard.json
+# Local runtime files
+.env
+.env.local
+.env.*.local
+
+# Local Prisma SQLite database
+prisma/db/
+*.db
+*.sqlite
+*.sqlite-journal
