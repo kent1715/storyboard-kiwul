@@ -5,8 +5,15 @@ import { Progress } from '@/components/ui/progress';
 import { useStoryboardStore } from '@/lib/store/storyboard-store';
 
 export function JobProgress() {
-  const { activeJob, setActiveJob, updateSceneFromJob, isPolling, setIsPolling } =
-    useStoryboardStore();
+  const {
+    currentProject,
+    activeJob,
+    setActiveJob,
+    updateSceneFromJob,
+    isPolling,
+    setIsPolling,
+    setScenes,
+  } = useStoryboardStore();
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const pollJobStatus = useCallback(async () => {
@@ -28,6 +35,21 @@ export function JobProgress() {
           updateSceneFromJob(job.updated_scenes);
         }
 
+        // Force refresh scenes from database so completed videos/images appear in UI
+        if (currentProject?.id) {
+          try {
+            const sceneRes = await fetch(`/api/storyboard/${currentProject.id}/scenes`, {
+              cache: 'no-store',
+            });
+            const sceneData = await sceneRes.json();
+            if (sceneData.ok && Array.isArray(sceneData.scenes)) {
+              setScenes(sceneData.scenes);
+            }
+          } catch {
+            // Silently fail scene refresh
+          }
+        }
+
         // Stop polling if job is done
         if (['completed', 'stopped', 'failed'].includes(job.status)) {
           setIsPolling(false);
@@ -40,7 +62,7 @@ export function JobProgress() {
     } catch {
       // Silently fail polling
     }
-  }, [activeJob, setActiveJob, updateSceneFromJob, setIsPolling]);
+  }, [activeJob, currentProject?.id, setActiveJob, updateSceneFromJob, setIsPolling, setScenes]);
 
   // Start/stop polling
   useEffect(() => {

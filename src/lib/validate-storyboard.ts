@@ -16,9 +16,11 @@ export function validateStoryboardJSON(data: unknown): ValidationResult {
     errors.push('Field "project" wajib ada dan berupa object');
   } else {
     const project = json.project as Record<string, unknown>;
+
     if (!project.title || typeof project.title !== 'string') {
       errors.push('Field "project.title" wajib ada dan berupa string');
     }
+
     if (project.aspect_ratio && typeof project.aspect_ratio === 'string') {
       if (!Object.keys(ASPECT_RATIOS).includes(project.aspect_ratio)) {
         errors.push(`Aspect ratio "${project.aspect_ratio}" tidak valid. Hanya mendukung: ${Object.keys(ASPECT_RATIOS).join(', ')}`);
@@ -47,12 +49,12 @@ export function validateStoryboardJSON(data: unknown): ValidationResult {
     }
 
     const s = scene as Record<string, unknown>;
+    const sceneLabel = `Scene ke-${index + 1} (${s.scene_id || 'unknown'})`;
 
     // 5. Check scene_id
     if (!s.scene_id || typeof s.scene_id !== 'string') {
       errors.push(`Scene ke-${index + 1}: field "scene_id" wajib ada dan berupa string`);
     } else {
-      // 10. Check duplicate scene_id
       if (sceneIds.has(s.scene_id as string)) {
         errors.push(`Scene ID "${s.scene_id}" duplikat`);
       }
@@ -61,38 +63,53 @@ export function validateStoryboardJSON(data: unknown): ValidationResult {
 
     // 6. Check vo
     if (!s.vo || typeof s.vo !== 'string') {
-      errors.push(`Scene ke-${index + 1} (${s.scene_id || 'unknown'}): field "vo" wajib ada dan berupa string`);
+      errors.push(`${sceneLabel}: field "vo" wajib ada dan berupa string`);
     }
 
-    // 7. Check image_prompt
+    // 7. Check background_prompt, optional for old JSON but recommended for Qwen two-character workflow
+    if (s.background_prompt !== undefined && typeof s.background_prompt !== 'string') {
+      errors.push(`${sceneLabel}: field "background_prompt" harus berupa string jika ada`);
+    }
+
+    if (s.background_negative_prompt !== undefined && typeof s.background_negative_prompt !== 'string') {
+      errors.push(`${sceneLabel}: field "background_negative_prompt" harus berupa string jika ada`);
+    }
+
+    if (!s.background_prompt) {
+      warnings.push(`${sceneLabel}: field "background_prompt" kosong. Untuk workflow Qwen 2 karakter, sebaiknya isi background_prompt environment only.`);
+    }
+
+    // 8. Check image_prompt
     if (!s.image_prompt || typeof s.image_prompt !== 'string') {
-      errors.push(`Scene ke-${index + 1} (${s.scene_id || 'unknown'}): field "image_prompt" wajib ada dan berupa string`);
+      errors.push(`${sceneLabel}: field "image_prompt" wajib ada dan berupa string`);
     }
 
-    // 8. Check video_prompt
+    // 9. Check video_prompt
     if (!s.video_prompt || typeof s.video_prompt !== 'string') {
-      errors.push(`Scene ke-${index + 1} (${s.scene_id || 'unknown'}): field "video_prompt" wajib ada dan berupa string`);
+      errors.push(`${sceneLabel}: field "video_prompt" wajib ada dan berupa string`);
     }
 
-    // 9. Check duration
+    // 10. Check duration
     if (s.duration === undefined || s.duration === null || typeof s.duration !== 'number') {
-      errors.push(`Scene ke-${index + 1} (${s.scene_id || 'unknown'}): field "duration" wajib ada dan berupa number`);
+      errors.push(`${sceneLabel}: field "duration" wajib ada dan berupa number`);
     } else {
       totalDuration += s.duration as number;
     }
   });
 
-  // 12. Duration validation
+  // 11. Duration validation
   if (totalDuration < 30) {
     warnings.push('Durasi terlalu pendek. Minimum 30 detik.');
   }
+
   if (totalDuration > 900) {
     warnings.push('Durasi terlalu panjang. Maximum 15 menit (900 detik).');
   }
 
-  // 13. Compare project duration with scene total
+  // 12. Compare project duration with scene total
   if (json.project && typeof json.project === 'object') {
     const project = json.project as Record<string, unknown>;
+
     if (project.duration_seconds && typeof project.duration_seconds === 'number') {
       if (Math.abs((project.duration_seconds as number) - totalDuration) > 1) {
         warnings.push('Durasi project tidak sama dengan total durasi scene.');

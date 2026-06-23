@@ -55,10 +55,32 @@ export async function readOriginalJSON(projectId: string) {
   return JSON.parse(content);
 }
 
+function sleepMs(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export async function saveImageFile(projectId: string, sceneId: string, buffer: Buffer, ext: string = 'png') {
   await ensureProjectDirs(projectId);
-  const filePath = path.join(getImagesDir(projectId), `${sceneId}.${ext}`);
-  await writeFile(filePath, buffer);
+
+  // Jangan overwrite file lama, karena di Windows file lama sering terkunci browser/preview.
+  const safeSceneId = sceneId.replace(/[^a-zA-Z0-9_-]/g, '_');
+  const fileName = `${safeSceneId}_${Date.now()}.${ext}`;
+  const filePath = path.join(getImagesDir(projectId), fileName);
+
+  for (let attempt = 1; attempt <= 10; attempt++) {
+    try {
+      await writeFile(filePath, buffer);
+      break;
+    } catch (error: any) {
+      if ((error?.code === 'EBUSY' || error?.code === 'EPERM') && attempt < 10) {
+        console.warn(`[saveImageFile] ${error.code} on ${filePath}, retry ${attempt}/10`);
+        await sleepMs(500);
+        continue;
+      }
+      throw error;
+    }
+  }
+
   return filePath;
 }
 

@@ -20,7 +20,9 @@ import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
 import { useStoryboardStore } from '@/lib/store/storyboard-store';
 import { TopToolbar } from './TopToolbar';
+import { ReferencePanel } from './ReferencePanel';
 import { StorylineColumn } from './StorylineColumn';
+import { BackgroundColumn } from './BackgroundColumn';
 import { GambarColumn } from './GambarColumn';
 import { VideoColumn } from './VideoColumn';
 import { LoadJsonDialog } from './LoadJsonDialog';
@@ -31,7 +33,7 @@ import { toast } from 'sonner';
 export function StoryboardStudio() {
   const { currentProject, setLoadJsonDialogOpen, setProjectListDialogOpen } = useStoryboardStore();
   const { theme, setTheme } = useTheme();
-  const [mobileTab, setMobileTab] = useState<'storyline' | 'gambar' | 'video'>('storyline');
+  const [mobileTab, setMobileTab] = useState<'storyline' | 'background' | 'gambar' | 'video'>('storyline');
 
   const handleGenerateAll = useCallback(async () => {
     if (!currentProject) return;
@@ -225,14 +227,18 @@ export function StoryboardStudio() {
         </div>
 
         {/* Column Headers - Desktop */}
-        <div className="hidden md:grid grid-cols-3 border-t">
+        <div className="hidden md:grid grid-cols-4 border-t">
           <div className="flex items-center gap-2 px-4 py-2 border-r">
             <div className="h-2.5 w-2.5 rounded-full bg-violet-500" />
             <span className="text-xs font-semibold text-violet-600 dark:text-violet-400">Storyline</span>
           </div>
           <div className="flex items-center gap-2 px-4 py-2 border-r">
             <div className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-            <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">Gambar</span>
+            <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">Background</span>
+          </div>
+          <div className="flex items-center gap-2 px-4 py-2 border-r">
+            <div className="h-2.5 w-2.5 rounded-full bg-amber-500" />
+            <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">Action Image</span>
           </div>
           <div className="flex items-center gap-2 px-4 py-2">
             <div className="h-2.5 w-2.5 rounded-full bg-blue-500" />
@@ -250,11 +256,18 @@ export function StoryboardStudio() {
             Storyline
           </button>
           <button
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium transition-colors ${mobileTab === 'gambar' ? 'text-emerald-600 border-b-2 border-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/20 dark:border-emerald-400' : 'text-muted-foreground'}`}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium transition-colors ${mobileTab === 'background' ? 'text-emerald-600 border-b-2 border-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/20 dark:border-emerald-400' : 'text-muted-foreground'}`}
+            onClick={() => setMobileTab('background')}
+          >
+            <ImageIcon className="h-3.5 w-3.5" />
+            BG
+          </button>
+          <button
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium transition-colors ${mobileTab === 'gambar' ? 'text-amber-600 border-b-2 border-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/20 dark:border-amber-400' : 'text-muted-foreground'}`}
             onClick={() => setMobileTab('gambar')}
           >
             <ImageIcon className="h-3.5 w-3.5" />
-            Gambar
+            Action
           </button>
           <button
             className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium transition-colors ${mobileTab === 'video' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-950/20 dark:border-blue-400' : 'text-muted-foreground'}`}
@@ -266,12 +279,16 @@ export function StoryboardStudio() {
         </div>
 
         <TopToolbar />
+        <ReferencePanel />
       </header>
 
-      {/* 3-Column Content - Desktop */}
-      <div className="hidden md:grid flex-1 min-h-0 grid-cols-3 divide-x divide-border overflow-hidden">
+      {/* 4-Column Content - Desktop */}
+      <div className="hidden md:grid flex-1 min-h-0 grid-cols-4 divide-x divide-border overflow-hidden">
         <div className="overflow-y-auto custom-scrollbar">
           <StorylineColumn />
+        </div>
+        <div className="overflow-y-auto custom-scrollbar">
+          <BackgroundColumn />
         </div>
         <div className="overflow-y-auto custom-scrollbar">
           <GambarColumn />

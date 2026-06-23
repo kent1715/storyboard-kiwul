@@ -48,7 +48,7 @@ export function PreviewPanel() {
     if (!scene?.video_path || !currentProject) return;
     try {
       const res = await fetch(
-        `/api/storyboard/${currentProject.id}/scenes/${scene.scene_id}/download/video`
+        `/api/storyboard/${currentProject.id}/scenes/${scene.scene_id}/download/video?v=${Date.now()}`
       );
       if (res.ok) {
         const blob = await res.blob();
@@ -141,11 +141,9 @@ export function PreviewPanel() {
     );
   }
 
-  const imageUrl = scene.image_path
-    ? `/api/storyboard/${currentProject?.id}/scenes/${scene.scene_id}/download/image`
-    : null;
+  const imageUrl = scene.image_path || null;
   const videoUrl = scene.video_path
-    ? `/api/storyboard/${currentProject?.id}/scenes/${scene.scene_id}/download/video`
+    ? `/api/storyboard/${currentProject?.id}/scenes/${scene.scene_id}/download/video?v=${Date.now()}`
     : null;
 
   return (

@@ -18,6 +18,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useStoryboardStore, SceneData } from '@/lib/store/storyboard-store';
+import { SceneCharacterSelector } from './SceneCharacterSelector';
 import { StatusBadge } from './StatusBadge';
 import { toast } from 'sonner';
 
@@ -243,6 +244,14 @@ export function SceneDetailPanel() {
           />
         </div>
 
+        {/* Scene Character Reference */}
+        {currentProject?.id && scene?.scene_id && (
+          <SceneCharacterSelector
+            projectId={currentProject.id}
+            sceneId={scene.scene_id}
+          />
+        )}
+
         {/* VO */}
         <div className="space-y-1.5">
           <Label className="text-xs font-medium">Voice Over (VO)</Label>
@@ -252,6 +261,30 @@ export function SceneDetailPanel() {
             onBlur={(e) => handleBlur('vo', e.target.value)}
             className="min-h-[80px] text-sm resize-y"
             placeholder="Voice over text..."
+          />
+        </div>
+
+        {/* Background Prompt */}
+        <div className="space-y-1.5">
+          <Label className="text-xs font-medium">Background Prompt</Label>
+          <Textarea
+            value={scene.background_prompt || ''}
+            onChange={(e) => handleFieldChange('background_prompt', e.target.value)}
+            onBlur={(e) => handleBlur('background_prompt', e.target.value)}
+            className="min-h-[80px] text-sm resize-y"
+            placeholder="Background/environment only prompt..."
+          />
+        </div>
+
+        {/* Background Negative Prompt */}
+        <div className="space-y-1.5">
+          <Label className="text-xs font-medium">Background Negative Prompt</Label>
+          <Textarea
+            value={scene.background_negative_prompt || ''}
+            onChange={(e) => handleFieldChange('background_negative_prompt', e.target.value)}
+            onBlur={(e) => handleBlur('background_negative_prompt', e.target.value)}
+            className="min-h-[60px] text-sm resize-y"
+            placeholder="Background negative prompt, e.g. people, face, silhouette..."
           />
         </div>
 

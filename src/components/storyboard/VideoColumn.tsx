@@ -5,10 +5,12 @@ import {
   Download,
   Film,
   Loader2,
+  RefreshCw,
   Play,
   MoreHorizontal,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { useStoryboardStore } from '@/lib/store/storyboard-store';
 import { toast } from 'sonner';
@@ -16,6 +18,7 @@ import { toast } from 'sonner';
 export function VideoColumn() {
   const { scenes, currentProject, updateScene } = useStoryboardStore();
   const [generating, setGenerating] = useState<string | null>(null);
+  const [generatingAllVideos, setGeneratingAllVideos] = useState(false);
 
   const aspectRatio = currentProject?.aspect_ratio === '16:9' ? 16 / 9 : 9 / 16;
 
@@ -57,12 +60,83 @@ export function VideoColumn() {
     [currentProject, updateScene]
   );
 
+  const handleGenerateAllVideosColumn = useCallback(async () => {
+    if (!currentProject) {
+      toast.error('Project belum dipilih');
+      return;
+    }
+
+    if (!scenes.length) {
+      toast.error('Tidak ada scene');
+      return;
+    }
+
+    setGeneratingAllVideos(true);
+
+    let successCount = 0;
+    let failedCount = 0;
+    let skippedCount = 0;
+
+    try {
+      for (const scene of scenes) {
+        if (scene.locked) continue;
+
+        if (scene.image_status !== 'completed') {
+          skippedCount++;
+          continue;
+        }
+
+        setGenerating(scene.scene_id);
+        updateScene(scene.scene_id, { video_status: 'running', error_message: null });
+
+        try {
+          const res = await fetch(
+            `/api/storyboard/${currentProject.id}/scenes/${scene.scene_id}/video`,
+            { method: 'POST' }
+          );
+
+          const data = await res.json();
+
+          if (data.ok) {
+            updateScene(scene.scene_id, {
+              video_status: 'completed',
+              video_path: data.video_path,
+              error_message: null,
+            });
+            successCount++;
+          } else {
+            updateScene(scene.scene_id, {
+              video_status: 'failed',
+              error_message: data.error || 'Gagal membuat video',
+            });
+            failedCount++;
+          }
+        } catch (err) {
+          updateScene(scene.scene_id, {
+            video_status: 'failed',
+            error_message: err instanceof Error ? err.message : 'Unknown error',
+          });
+          failedCount++;
+        }
+      }
+
+      if (failedCount > 0 || skippedCount > 0) {
+        toast.error(`Generate video selesai: ${successCount} sukses, ${failedCount} gagal, ${skippedCount} dilewati`);
+      } else {
+        toast.success(`Semua video selesai: ${successCount} scene`);
+      }
+    } finally {
+      setGenerating(null);
+      setGeneratingAllVideos(false);
+    }
+  }, [currentProject, scenes, updateScene]);
+
   const handleDownloadVideo = useCallback(
     async (sceneId: string, sceneNumber: number) => {
       if (!currentProject) return;
       try {
         const res = await fetch(
-          `/api/storyboard/${currentProject.id}/scenes/${sceneId}/download/video`
+          `/api/storyboard/${currentProject.id}/scenes/${sceneId}/download/video?v=${Date.now()}`
         );
         if (res.ok) {
           const blob = await res.blob();
@@ -84,9 +158,25 @@ export function VideoColumn() {
 
   return (
     <div className="p-3 space-y-4">
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur pb-2">
+        <Button
+          variant="default"
+          size="sm"
+          className="w-full h-8 text-xs gap-1"
+          disabled={generatingAllVideos || Boolean(generating)}
+          onClick={handleGenerateAllVideosColumn}
+        >
+          {generatingAllVideos ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <RefreshCw className="h-3.5 w-3.5" />
+          )}
+          Generate All Videos
+        </Button>
+      </div>
       {scenes.map((scene) => {
         const videoUrl = scene.video_path
-          ? `/api/storyboard/${currentProject?.id}/scenes/${scene.scene_id}/download/video`
+          ? `/api/storyboard/${currentProject?.id}/scenes/${scene.scene_id}/download/video?v=${Date.now()}`
           : null;
         const isGenerating = generating === scene.scene_id;
 
@@ -149,9 +239,30 @@ export function VideoColumn() {
               <p className="text-[10px] font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
                 Prompt Motion
               </p>
-              <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
-                {scene.video_prompt}
-              </p>
+              <Textarea
+                value={scene.video_prompt || ''}
+                onChange={(e) =>
+                  updateScene(scene.scene_id, { video_prompt: e.target.value })
+                }
+                onBlur={async (e) => {
+                  if (!currentProject) return;
+                  const value = e.target.value;
+                  const res = await fetch(`/api/storyboard/${currentProject.id}/scenes/${scene.scene_id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ video_prompt: value }),
+                  });
+                  const data = await res.json();
+                  if (!data.ok) {
+                    toast.error(data.error || 'Gagal menyimpan prompt video');
+                  } else {
+                    toast.success('Prompt video tersimpan');
+                  }
+                }}
+                className="min-h-[88px] text-xs resize-y"
+                placeholder="Edit prompt video..."
+                disabled={isGenerating || scene.video_status === 'running'}
+              />
             </div>
 
             {/* Duration */}
@@ -168,7 +279,7 @@ export function VideoColumn() {
                   size="sm"
                   className="h-7 text-[10px] gap-1 flex-1 border-blue-300 text-blue-700 hover:bg-blue-50 dark:border-blue-700 dark:text-blue-400 dark:hover:bg-blue-950"
                   onClick={() => handleGenerateVideo(scene.scene_id)}
-                  disabled={isGenerating || scene.locked || scene.image_status !== 'completed'}
+                  disabled={isGenerating || scene.locked || scene.image_status !== 'completed' || generatingAllVideos}
                 >
                   {isGenerating ? (
                     <Loader2 className="h-3 w-3 animate-spin" />
@@ -184,7 +295,7 @@ export function VideoColumn() {
                     size="sm"
                     className="h-7 text-[10px] gap-1 flex-1"
                     onClick={() => handleGenerateVideo(scene.scene_id)}
-                    disabled={isGenerating || scene.locked}
+                    disabled={isGenerating || scene.locked || generatingAllVideos}
                   >
                     {isGenerating ? (
                       <Loader2 className="h-3 w-3 animate-spin" />

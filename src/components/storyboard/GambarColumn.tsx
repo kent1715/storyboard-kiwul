@@ -6,16 +6,20 @@ import {
   RotateCcw,
   ImageIcon,
   Loader2,
+  RefreshCw,
   MoreHorizontal,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { useStoryboardStore } from '@/lib/store/storyboard-store';
+import { SceneCharacterSelector } from './SceneCharacterSelector';
 import { toast } from 'sonner';
 
 export function GambarColumn() {
   const { scenes, currentProject, updateScene } = useStoryboardStore();
   const [generating, setGenerating] = useState<string | null>(null);
+  const [generatingAllImages, setGeneratingAllImages] = useState(false);
 
   const aspectRatio = currentProject?.aspect_ratio === '16:9' ? 16 / 9 : 9 / 16;
 
@@ -57,6 +61,71 @@ export function GambarColumn() {
     [currentProject, updateScene]
   );
 
+  const handleGenerateAllImagesColumn = useCallback(async () => {
+    if (!currentProject) {
+      toast.error('Project belum dipilih');
+      return;
+    }
+
+    if (!scenes.length) {
+      toast.error('Tidak ada scene');
+      return;
+    }
+
+    setGeneratingAllImages(true);
+
+    let successCount = 0;
+    let failedCount = 0;
+
+    try {
+      for (const scene of scenes) {
+        if (scene.locked) continue;
+
+        setGenerating(scene.scene_id);
+        updateScene(scene.scene_id, { image_status: 'running', error_message: null });
+
+        try {
+          const res = await fetch(
+            `/api/storyboard/${currentProject.id}/scenes/${scene.scene_id}/image`,
+            { method: 'POST' }
+          );
+
+          const data = await res.json();
+
+          if (data.ok) {
+            updateScene(scene.scene_id, {
+              image_status: 'completed',
+              image_path: data.image_path,
+              error_message: null,
+            });
+            successCount++;
+          } else {
+            updateScene(scene.scene_id, {
+              image_status: 'failed',
+              error_message: data.error || 'Gagal membuat gambar',
+            });
+            failedCount++;
+          }
+        } catch (err) {
+          updateScene(scene.scene_id, {
+            image_status: 'failed',
+            error_message: err instanceof Error ? err.message : 'Unknown error',
+          });
+          failedCount++;
+        }
+      }
+
+      if (failedCount > 0) {
+        toast.error(`Generate image selesai: ${successCount} sukses, ${failedCount} gagal`);
+      } else {
+        toast.success(`Semua image selesai: ${successCount} scene`);
+      }
+    } finally {
+      setGenerating(null);
+      setGeneratingAllImages(false);
+    }
+  }, [currentProject, scenes, updateScene]);
+
   const handleDownloadImage = useCallback(
     async (sceneId: string, sceneNumber: number) => {
       if (!currentProject) return;
@@ -84,10 +153,24 @@ export function GambarColumn() {
 
   return (
     <div className="p-3 space-y-4">
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur pb-2">
+        <Button
+          variant="default"
+          size="sm"
+          className="w-full h-8 text-xs gap-1"
+          disabled={generatingAllImages || Boolean(generating)}
+          onClick={handleGenerateAllImagesColumn}
+        >
+          {generatingAllImages ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <RefreshCw className="h-3.5 w-3.5" />
+          )}
+          Generate All Images
+        </Button>
+      </div>
       {scenes.map((scene) => {
-        const imageUrl = scene.image_path
-          ? `/api/storyboard/${currentProject?.id}/scenes/${scene.scene_id}/download/image`
-          : null;
+        const imageUrl = scene.image_path || null;
         const isGenerating = generating === scene.scene_id;
 
         return (
@@ -142,10 +225,39 @@ export function GambarColumn() {
               <p className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
                 Prompt Gambar
               </p>
-              <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
-                {scene.image_prompt}
-              </p>
+              <Textarea
+                value={scene.image_prompt || ''}
+                onChange={(e) =>
+                  updateScene(scene.scene_id, { image_prompt: e.target.value })
+                }
+                onBlur={async (e) => {
+                  if (!currentProject) return;
+                  const value = e.target.value;
+                  const res = await fetch(`/api/storyboard/${currentProject.id}/scenes/${scene.scene_id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image_prompt: value }),
+                  });
+                  const data = await res.json();
+                  if (!data.ok) {
+                    toast.error(data.error || 'Gagal menyimpan prompt gambar');
+                  } else {
+                    toast.success('Prompt gambar tersimpan');
+                  }
+                }}
+                className="min-h-[88px] text-xs resize-y"
+                placeholder="Edit prompt gambar..."
+                disabled={isGenerating || scene.image_status === 'running'}
+              />
             </div>
+
+            {/* Scene Character Reference */}
+            {currentProject?.id && scene?.scene_id && (
+              <SceneCharacterSelector
+                projectId={currentProject.id}
+                sceneId={scene.scene_id}
+              />
+            )}
 
             {/* Action Buttons */}
             <div className="flex items-center gap-2">
@@ -155,7 +267,7 @@ export function GambarColumn() {
                   size="sm"
                   className="h-7 text-[10px] gap-1 flex-1 border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-400 dark:hover:bg-emerald-950"
                   onClick={() => handleGenerateImage(scene.scene_id)}
-                  disabled={isGenerating || scene.locked}
+                  disabled={isGenerating || scene.locked || generatingAllImages}
                 >
                   {isGenerating ? (
                     <Loader2 className="h-3 w-3 animate-spin" />
@@ -171,7 +283,7 @@ export function GambarColumn() {
                     size="sm"
                     className="h-7 text-[10px] gap-1 flex-1"
                     onClick={() => handleGenerateImage(scene.scene_id)}
-                    disabled={isGenerating || scene.locked}
+                    disabled={isGenerating || scene.locked || generatingAllImages}
                   >
                     {isGenerating ? (
                       <Loader2 className="h-3 w-3 animate-spin" />

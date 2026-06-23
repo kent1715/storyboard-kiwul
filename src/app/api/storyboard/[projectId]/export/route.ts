@@ -43,6 +43,8 @@ export async function GET(
         duration: scene.duration,
         vo: scene.vo,
         image_prompt: scene.image_prompt,
+      background_prompt: scene.background_prompt,
+      background_negative_prompt: scene.background_negative_prompt,
         video_prompt: scene.video_prompt,
         negative_prompt: scene.negative_prompt,
         locked: scene.locked,

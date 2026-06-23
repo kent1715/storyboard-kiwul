@@ -21,6 +21,9 @@ interface StoryboardJSONInput {
     image_prompt: string;
     video_prompt: string;
     negative_prompt?: string;
+    background_prompt?: string;
+    background_negative_prompt?: string;
+    background_status?: string;
     image_status?: string;
     video_status?: string;
     locked?: boolean;
@@ -96,6 +99,9 @@ export async function POST(request: NextRequest) {
       image_prompt: scene.image_prompt,
       video_prompt: scene.video_prompt,
       negative_prompt: scene.negative_prompt || null,
+      background_prompt: scene.background_prompt || null,
+      background_negative_prompt: scene.background_negative_prompt || null,
+      background_status: scene.background_status || 'pending',
       image_status: scene.image_status || 'pending',
       video_status: scene.video_status || 'pending',
       locked: scene.locked || false,

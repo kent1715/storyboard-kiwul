@@ -7,6 +7,11 @@ interface SceneUpdate {
   image_prompt?: string;
   video_prompt?: string;
   negative_prompt?: string | null;
+  background_prompt?: string | null;
+  background_negative_prompt?: string | null;
+  background_path?: string | null;
+  background_status?: string;
+  background_error_message?: string | null;
   locked?: boolean;
   duration?: number;
   image_status?: string;
@@ -61,7 +66,7 @@ export async function POST(
         if (!sceneUpdate.scene_id) continue;
 
         const data: Record<string, unknown> = {};
-        const allowedFields = ['vo', 'image_prompt', 'video_prompt', 'negative_prompt', 'locked', 'duration', 'image_status', 'video_status'];
+        const allowedFields = ['vo', 'image_prompt', 'video_prompt', 'negative_prompt', 'background_prompt', 'background_negative_prompt', 'background_path', 'background_status', 'background_error_message', 'locked', 'duration', 'image_status', 'video_status'];
         for (const key of allowedFields) {
           if (sceneUpdate[key as keyof SceneUpdate] !== undefined) {
             data[key] = sceneUpdate[key as keyof SceneUpdate];

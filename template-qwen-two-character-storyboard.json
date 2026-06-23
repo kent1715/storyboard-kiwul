@@ -1,0 +1,24 @@
+{
+  "project": {
+    "title": "Template Qwen Two Character",
+    "language": "id",
+    "aspect_ratio": "9:16",
+    "resolution": "1080x1920",
+    "duration_seconds": 30,
+    "style": "2D cartoon cinematic",
+    "target_platform": "youtube_shorts"
+  },
+  "scenes": [
+    {
+      "scene_id": "scene_001",
+      "scene_number": 1,
+      "duration": 5,
+      "vo": "Narasi untuk scene ini.",
+      "background_prompt": "Empty 2D animated interior background plate. A simple warm Indonesian indoor room at night, wooden floor, wooden ceiling beams, cream wall, small framed wall painting, wooden table in the foreground, ceramic vase on the far left side of the table. Clean cartoon illustration style, soft cel shading, clean line art, warm orange brown palette, cozy lighting, simple background design. Unoccupied room. Empty room. Empty floor. Empty center space. Empty right side. Architectural interior only. Furniture and wall decoration only. No living beings anywhere in the image.",
+      "background_negative_prompt": "person, people, human, humans, child, children, kid, kids, boy, boys, girl, girls, man, woman, adult, face, body, head, hair, eyes, arms, legs, hands, silhouette, tiny person, small person, background person, background people, blurry person, crowd, extra character, mascot, animal, photo realistic, 3d render, text, watermark",
+      "image_prompt": "Create a natural final scene using Figure 1 as the background. Use Figures 2 and 3 only for character identity, face, hair, clothing, clothing color, body proportions, silhouette, and visual style. Do not copy the original poses, original hand positions, original props, original weapons, original objects, original pets, or original compositions of Figures 2 or 3. Change the pose of the character in Figure 2 to a new acting pose: holding a wad of cash in one hand, and pointing at a ceramic vase on the table in front of him with the other. Change the pose of the character in Figure 3 to a new acting pose: standing slightly behind and to the right, looking worried and anxious toward the character in Figure 2 and the vase, with both hands near their mouth. The character in Figure 3 should not retain the original standing pose of the reference. Blend both characters naturally into the lighting and perspective of Figure 1. The final result should be a single scene, not a reference sheet, not a character arrangement, not a poster.",
+      "video_prompt": "Animate the two characters in a 2D cinematic style. Figure 2 proudly shows the cash and points toward the ceramic vase. Figure 3 reacts with worried anxious expression, hands near mouth, slight trembling motion. Subtle camera push-in, warm indoor lighting, no new characters.",
+      "negative_prompt": ""
+    }
+  ]
+}

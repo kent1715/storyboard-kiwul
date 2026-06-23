@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getImagesDir, getVideosDir, getExportsDir, ensureProjectDirs, fileExists } from '@/lib/file-storage';
-import archiver from 'archiver';
+import * as archiverNS from 'archiver';
+const archiver = (archiverNS as any).default ?? (archiverNS as any);
 import { ReadStream } from 'fs';
 import { createReadStream, readdirSync, statSync } from 'fs';
 import { join } from 'path';
@@ -116,6 +117,8 @@ export async function GET(
           duration: scene.duration,
           vo: scene.vo,
           image_prompt: scene.image_prompt,
+      background_prompt: scene.background_prompt,
+      background_negative_prompt: scene.background_negative_prompt,
           video_prompt: scene.video_prompt,
           negative_prompt: scene.negative_prompt,
           locked: scene.locked,
@@ -140,7 +143,7 @@ export async function GET(
 
     const filename = `${project.title.replace(/[^a-zA-Z0-9]/g, '_')}_${type}.zip`;
 
-    return new NextResponse(zipBuffer, {
+    return new NextResponse(new Uint8Array(zipBuffer), {
       headers: {
         'Content-Type': 'application/zip',
         'Content-Disposition': `attachment; filename="${filename}"`,

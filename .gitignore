@@ -71,3 +71,78 @@ prisma/db/
 *.db
 *.sqlite
 *.sqlite-journal
+# ===== KIWUL DEBUG / PATCH LOCAL FILES =====
+*.bak
+*.bak_*
+*.route.ts.bak*
+*.before-*
+*.tmp
+*.temp
+
+logs/
+*.log
+dev.log
+
+# local patch / audit / debug scripts
+patch-*.cjs
+patch-*.js
+patch-*.py
+fix-*.cjs
+fix-*.js
+fix-*.py
+check-*.cjs
+check-*.js
+audit-*.cjs
+debug-*.js
+debug-*.txt
+force-*.cjs
+force-*.py
+reset-*.cjs
+recover-*.cjs
+remove-*.cjs
+rewrite-*.cjs
+set-scene*.cjs
+show-*.cjs
+extract-*.cjs
+queue-qwen-*.cjs
+qwen-sweep-*.json
+qwen-identity-workflow-*.json
+qwen-smoke-workflow-last.json
+test-*.png
+
+# generated/local outputs
+outputs/
+generated/
+tmp/
+temp/
+
+# local media/model files
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+*.wav
+*.mp3
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.onnx
+*.gguf
+
+# local db/env/cache
+.env
+.env.*
+!.env.example
+.next/
+node_modules/
+prisma/db/
+db/
+*.db
+*.sqlite
+*.sqlite3
+
+# optional duplicate lock if project uses bun.lock
+package-lock.json
+# ===== END KIWUL DEBUG / PATCH LOCAL FILES =====

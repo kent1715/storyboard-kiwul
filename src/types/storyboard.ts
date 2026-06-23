@@ -21,6 +21,11 @@ export interface SceneInput {
   image_prompt: string;
   video_prompt: string;
   negative_prompt?: string;
+  background_prompt?: string;
+  background_negative_prompt?: string;
+  background_path?: string | null;
+  background_status?: string;
+  background_error_message?: string | null;
   camera_prompt?: string;
   motion_prompt?: string;
   style_prompt?: string;

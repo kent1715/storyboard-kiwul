@@ -1,5 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+
+const ALLOWED_FIELDS = [
+  'vo',
+  'duration',
+  'image_prompt', 'background_prompt', 'background_negative_prompt',
+  'video_prompt',
+  'negative_prompt',
+  'locked',
+] as const;
 
 export async function PATCH(
   request: NextRequest,
@@ -7,10 +16,13 @@ export async function PATCH(
 ) {
   try {
     const { projectId, sceneId } = await params;
+    const body = await request.json();
 
-    // Find the scene
     const scene = await db.storyboardScene.findFirst({
-      where: { project_id: projectId, scene_id: sceneId },
+      where: {
+        project_id: projectId,
+        scene_id: sceneId,
+      },
     });
 
     if (!scene) {
@@ -20,42 +32,29 @@ export async function PATCH(
       );
     }
 
-    const body = await request.json();
+    const data: Record<string, any> = {};
 
-    // Only allow specific fields to be updated
-    const allowedFields = [
-      'vo',
-      'image_prompt',
-      'video_prompt',
-      'negative_prompt',
-      'locked',
-      'duration',
-      'image_status',
-      'video_status',
-    ];
-
-    const updateData: Record<string, unknown> = {};
-    for (const field of allowedFields) {
-      if (field in body) {
-        updateData[field] = body[field];
+    for (const field of ALLOWED_FIELDS) {
+      if (Object.prototype.hasOwnProperty.call(body, field)) {
+        data[field] = body[field];
       }
     }
 
-    if (Object.keys(updateData).length === 0) {
+    if (Object.keys(data).length === 0) {
       return NextResponse.json(
         { ok: false, error: 'No valid fields to update' },
         { status: 400 }
       );
     }
 
-    const updatedScene = await db.storyboardScene.update({
+    const updated = await db.storyboardScene.update({
       where: { id: scene.id },
-      data: updateData,
+      data,
     });
 
     return NextResponse.json({
       ok: true,
-      scene: updatedScene,
+      scene: updated,
     });
   } catch (error) {
     console.error('Update scene error:', error);

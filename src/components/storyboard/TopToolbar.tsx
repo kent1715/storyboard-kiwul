@@ -105,6 +105,34 @@ export function TopToolbar() {
     }
   }, [currentProject, setActiveJob]);
 
+  const handleRenderFinalVideo = async () => {
+    if (!currentProject?.id) return
+
+    try {
+      const res = await fetch(`/api/storyboard/${currentProject.id}/render`, {
+        method: 'POST',
+      })
+
+      const data = await res.json()
+
+      if (!data.ok) {
+        alert(data.error || 'Render final video failed')
+        console.error('[render final video]', data)
+        return
+      }
+
+      alert('Final video berhasil dirender.')
+    } catch (error) {
+      console.error('[render final video]', error)
+      alert('Render final video gagal.')
+    }
+  };
+
+  const handleDownloadFinalVideo = () => {
+    if (!currentProject?.id) return
+    window.open(`/api/storyboard/${currentProject.id}/download/final?v=${Date.now()}`, '_blank')
+  };
+
   const handleJobControl = useCallback(async (action: 'pause' | 'resume' | 'stop') => {
     if (!activeJob) return;
     try {
@@ -190,25 +218,25 @@ export function TopToolbar() {
         <Separator orientation="vertical" className="h-4 mx-1" />
 
         {/* Generate Buttons */}
+
         <Button
+          onClick={handleRenderFinalVideo}
+          disabled={!currentProject}
           variant="ghost"
           size="sm"
           className="h-6 text-[10px] gap-1 px-1.5"
-          onClick={() => handleGenerate('image')}
-          disabled={isJobRunning || !!generating}
         >
-          {generating === 'image' ? <Loader2 className="h-3 w-3 animate-spin" /> : <ImageIcon className="h-3 w-3" />}
-          Images
+          Render Final Video
         </Button>
+
         <Button
+          onClick={handleDownloadFinalVideo}
+          disabled={!currentProject}
           variant="ghost"
           size="sm"
           className="h-6 text-[10px] gap-1 px-1.5"
-          onClick={() => handleGenerate('video')}
-          disabled={isJobRunning || !!generating}
         >
-          {generating === 'video' ? <Loader2 className="h-3 w-3 animate-spin" /> : <Video className="h-3 w-3" />}
-          Videos
+          Download Final Video
         </Button>
         <Button
           variant="ghost"
@@ -218,7 +246,7 @@ export function TopToolbar() {
           disabled={isJobRunning || !!generating}
         >
           {generating === 'failed_only' ? <Loader2 className="h-3 w-3 animate-spin" /> : <RotateCcw className="h-3 w-3" />}
-          Failed
+          Generate Failed Only
         </Button>
 
         <Separator orientation="vertical" className="h-4 mx-1" />

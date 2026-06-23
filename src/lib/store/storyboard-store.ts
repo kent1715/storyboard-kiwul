@@ -16,12 +16,17 @@ export interface ProjectData {
   json_path: string | null;
 }
 
-export interface SceneData extends SceneInput {
+export interface SceneData extends Omit<SceneInput, 'negative_prompt' | 'background_prompt' | 'background_negative_prompt'> {
   id: string;
   project_id: string;
   scene_number: number;
   // Override optional fields from SceneInput with DB types
   negative_prompt: string | null;
+  background_prompt: string | null;
+  background_negative_prompt: string | null;
+  background_path: string | null;
+  background_status: string;
+  background_error_message: string | null;
   image_path: string | null;
   video_path: string | null;
   audio_path: string | null;
